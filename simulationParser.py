@@ -6,7 +6,6 @@ arguments = []
 fileText = ''
 
 
-
 def prepare_arguments():
     arguments.append("movlw")
     arguments.append("andlw")
@@ -20,17 +19,16 @@ def scan_arguments(file_name):
     """Search for the given string in file and return lines containing that string,
     along with line numbers"""
     line_number = 0
-    fileText = ""
     # Open the file in read only mode
     with open(file_name, 'r') as read_obj:
         # Read all lines in the file one by one
         for line in read_obj:
             # For each line, check if line contains the string
-            fileText = fileText + line
-            line_number += 1
-            for argument in arguments:
-                if argument in line:
-                    queue.append(argument)
+            if line[5] != ' ':
+                argument = line[5] + line[6]
+                address = line[7] + line[8]
+                queue.append((line_number, argument, address))
+                line_number += 1
 
 
 def execution(argument):
@@ -57,11 +55,14 @@ def get_file():
     scan_arguments(file_path)
     print(queue)
 
+
 def execute():
     for argument in arguments:
         execution(argument)
 
+
 def main():
     get_file()
-    execute()
 
+if __name__ == '__main__':
+    main()

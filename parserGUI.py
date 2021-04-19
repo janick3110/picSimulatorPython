@@ -6,6 +6,8 @@ from PyQt5.QtGui import QIcon
 import simulationParser as parsing
 
 
+
+
 class Example(QMainWindow):
     trigger = 0
 
@@ -18,7 +20,7 @@ class Example(QMainWindow):
         loadingAct = QAction(QIcon('load.png'), '&Load', self)
         loadingAct.setShortcut('Ctrl+L')
         loadingAct.setStatusTip('Load file')
-
+        loadingAct.triggered.connect(self.triggerExecution)
 
         exitAct = QAction(QIcon('exit.png'), '&Exit', self)
         exitAct.setShortcut('Ctrl+Q')
@@ -27,31 +29,27 @@ class Example(QMainWindow):
 
         self.statusBar()
 
-        textBox = QPlainTextEdit(self)
-        textBox.move(250, 120)
-        self.show()
+
 
         menubar = self.menuBar()
-        program = menubar.addMenu('&Load')
         file = menubar.addMenu('&File')
+        program = menubar.addMenu('&Program')
         program.addAction(exitAct)
         file.addAction(loadingAct)
 
-        self.resize(700, 700)
-        self.setWindowTitle('Simple menu')
+        self.resize(300, 100)
+        self.setWindowTitle('PicSim')
         self.show()
+
+
+    def triggerExecution(self):
+        parsing.get_file()
 
 
 def main():
     app = QApplication(sys.argv)
     ex = Example()
     sys.exit(app.exec_())
-
-
-def triggerExecution():
-    if Example.trigger == 1:
-        parsing.main()
-    Example.trigger = 1
 
 
 if __name__ == '__main__':
