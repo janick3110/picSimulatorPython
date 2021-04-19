@@ -2,6 +2,7 @@
 
 
 adressspace = [int] * 1024
+
 z_flag = False
 c_flag = False
 rp0 = False
