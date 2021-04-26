@@ -1,9 +1,12 @@
 import sys
 
+from PyQt5 import QtCore
+
+import simulationParser
 
 from PyQt5.QtWidgets import (
 
-    QApplication, QDialog, QMainWindow, QMessageBox
+    QApplication, QDialog, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 
 )
 
@@ -24,32 +27,35 @@ class Window(QMainWindow, Ui_PicSimulator):
     def connectSignalsSlots(self):
 
         self.actionBeenden.triggered.connect(self.close)
+        self.actionDatei_laden.triggered.connect(self.fLoadFile)
+        self.button_start.pressed.connect(self.fButtonStart)
 
-        self.actionDatei_laden.triggered.connect(self.loadFile)
+
+    def fLoadFile(self):
+        simulationParser.get_file()
 
 
-    def loadFile(self):
+        header = self.showCode.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+
+        for i in range(len(simulationParser.queue)):
+
+            item = QTableWidgetItem()
+            item.setFlags(QtCore.Qt.ItemIsUserCheckable |
+                          QtCore.Qt.ItemIsEnabled)
+            item.setCheckState(QtCore.Qt.Unchecked)
+
+            self.showCode.insertRow(i)
+            self.showCode.setItem(i, 0, item)
+            self.showCode.setItem(i, 1, QTableWidgetItem(str(simulationParser.queue[i][0])))
+            self.showCode.setItem(i, 2, QTableWidgetItem(str(simulationParser.queue[i][1]) + str(simulationParser.queue[i][2])))
+            self.showCode.setItem(i, 3, QTableWidgetItem())
+
+
+
+
+    def fButtonStart(self):
         return
-        # TODO
-
-
-    def about(self):
-
-        QMessageBox.about(
-
-            self,
-
-            "About Sample Editor",
-
-            "<p>A sample text editor app built with:</p>"
-
-            "<p>- PyQt</p>"
-
-            "<p>- Qt Designer</p>"
-
-            "<p>- Python</p>",
-
-        )
 
 
 class FindReplaceDialog(QDialog):
