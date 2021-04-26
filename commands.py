@@ -1,13 +1,19 @@
+import utility as u
+import memory as mem
+
 def MOVLW(literal):
-    return NotImplemented
+    """The contents of the W register are
+added to the eight bit literal ’k’ and the
+result is placed in the W register."""
+    mem.w_register = literal
 
 
 def ADDLW(literal):
-    return NotImplemented
+    mem.w_register += literal
 
 
 def SUBLW(literal):
-    return NotImplemented
+    mem.w_register -= literal
 
 
 def CALL(subroutine):
@@ -47,16 +53,37 @@ def RRF(register, destination):
 
 
 def BSF(register, bit):
-    register[bit] = 1
+    binaryList = list(u.integer_to_binary(register))
+    binaryList[14-bit] = "1"
+    binary = "".join(binaryList)
+    print(u.binary_to_integer(binary))
 
 
 def BCF(register, bit):
-    register[bit] = 1
+    binaryList = list(u.integer_to_binary(register))
+    binaryList[14 - bit] = "0"
+    binary = "".join(binaryList)
+    print(u.binary_to_integer(binary))
 
 
 def BTFSC(register, bit):
-    return NotImplemented
+    binary = u.integer_to_binary(register)
+    if binary[14-bit] == "0":
+        print("Bit cleared")
+    else:
+        print("Bit not cleared")
 
 
 def BTFSS(register, bit):
-    return NotImplemented
+    binary = u.integer_to_binary(register)
+    if binary[14-bit] == "1":
+        print("Bit set")
+    else:
+        print("Bit not set")
+
+
+if __name__ == '__main__':
+    print(u.integer_to_binary(2))
+
+
+
