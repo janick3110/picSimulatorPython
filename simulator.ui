@@ -26,7 +26,7 @@
       <x>720</x>
       <y>20</y>
       <width>160</width>
-      <height>267</height>
+      <height>291</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="controls">
@@ -156,9 +156,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_18">
+      <widget class="QLabel" name="runtime">
        <property name="text">
         <string>0.000</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_Reset">
+       <property name="text">
+        <string>Reset</string>
        </property>
       </widget>
      </item>
@@ -522,7 +529,7 @@
    <widget class="QWidget" name="verticalLayoutWidget_9">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>990</x>
       <y>290</y>
       <width>261</width>
       <height>71</height>

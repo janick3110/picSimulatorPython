@@ -35,6 +35,8 @@ class Window(QMainWindow, Ui_PicSimulator):
         simulationParser.queue = []
         simulationParser.get_file()
 
+
+
         header = self.showCode.horizontalHeader()
         for i in range(0,7):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
@@ -59,6 +61,10 @@ class Window(QMainWindow, Ui_PicSimulator):
     def fButtonStart(self):
         print("Halt")
         actualSimulator.simulate()
+
+    def updateClock(self, time):
+        self.runtime.setText(time)
+
 
 class FindReplaceDialog(QDialog):
 
