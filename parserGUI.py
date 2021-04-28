@@ -12,6 +12,7 @@ class Example(QMainWindow):
     trigger = 0
 
     def __init__(self):
+        """"""
         super().__init__()
 
         self.initUI()
