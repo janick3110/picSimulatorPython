@@ -36,9 +36,10 @@ class Window(QMainWindow, Ui_PicSimulator):
 
 
         header = self.showCode.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        for i in range(0,7):
+            header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
 
-        for i in range(len(simulationParser.queue)):
+        for i in range(len(simulationParser.lst)):
 
             item = QTableWidgetItem()
             item.setFlags(QtCore.Qt.ItemIsUserCheckable |
@@ -47,9 +48,12 @@ class Window(QMainWindow, Ui_PicSimulator):
 
             self.showCode.insertRow(i)
             self.showCode.setItem(i, 0, item)
-            self.showCode.setItem(i, 1, QTableWidgetItem(str(simulationParser.queue[i][0])))
-            self.showCode.setItem(i, 2, QTableWidgetItem(str(simulationParser.queue[i][1]) + str(simulationParser.queue[i][2])))
-            self.showCode.setItem(i, 3, QTableWidgetItem())
+            self.showCode.setItem(i, 1, QTableWidgetItem(str(simulationParser.lst[i][0])))
+            self.showCode.setItem(i, 2, QTableWidgetItem(str(simulationParser.lst[i][1])))
+            self.showCode.setItem(i, 3, QTableWidgetItem(str(simulationParser.lst[i][2])))
+            self.showCode.setItem(i, 4, QTableWidgetItem(str(simulationParser.lst[i][3])))
+            self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
+            self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
 
 
 
