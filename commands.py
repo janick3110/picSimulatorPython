@@ -1,6 +1,7 @@
 import utility as u
 import memory as mem
 import data
+import time
 
 def MOVLW(literal):
     """The contents of the W register are
@@ -72,37 +73,27 @@ def BCF(registerVal, bit):
 
 
 def BTFSC(register, bit):
-
-
-
-    binary = u.integer_to_binary(register)
-    if binary[14-bit] == "0":
-        print("Bit cleared")
+    test = register & (pow(2,bit))
+    if test == pow(2,bit):
+        return False
     else:
-        print("Bit not cleared")
+        return True
 
 
 def BTFSS(register, bit):
-    binary = u.integer_to_binary(register)
-    if binary[14-bit] == "1":
-        print("Bit set")
+    test = register & (pow(2,bit))
+    if test == pow(2,bit):
+        return True
     else:
-        print("Bit not set")
+        return False
 
+def SLEEP(duration):
+    time.sleep(duration)
 
 if __name__ == '__main__':
-    data.c_flag = False
-
-    print(data.c_flag)
-    print(hex(RLF(128, 0)))
-    print(data.c_flag)
-    print(u.integer_to_binary(RLF(1, 0)))
-    print(data.c_flag)
-
-
-    #print(u.integer_to_binary(BSF(0, 7)))
-
-    #print(u.integer_to_binary(BCF(0xFF, 0)))
+    print(time.time())
+    SLEEP(10)
+    print(time.time())
 
 
 

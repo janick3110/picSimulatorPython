@@ -3,6 +3,7 @@ import sys
 from PyQt5 import QtCore
 
 import simulationParser
+import actualSimulator
 
 from PyQt5.QtWidgets import (
 
@@ -53,10 +54,11 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.showCode.setItem(i, 4, QTableWidgetItem(str(simulationParser.lst[i][3])))
             self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
             self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
+            #self.showCode.selectRow(i) marks table row
 
     def fButtonStart(self):
-        return
-
+        print("Halt")
+        actualSimulator.simulate()
 
 class FindReplaceDialog(QDialog):
 
