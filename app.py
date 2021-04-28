@@ -23,17 +23,16 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         self.connectSignalsSlots()
 
-
+    # IMPORTANT
     def connectSignalsSlots(self):
 
         self.actionBeenden.triggered.connect(self.close)
         self.actionDatei_laden.triggered.connect(self.fLoadFile)
         self.button_start.pressed.connect(self.fButtonStart)
 
-
     def fLoadFile(self):
+        simulationParser.queue = []
         simulationParser.get_file()
-
 
         header = self.showCode.horizontalHeader()
         for i in range(0,7):
@@ -54,9 +53,6 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.showCode.setItem(i, 4, QTableWidgetItem(str(simulationParser.lst[i][3])))
             self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
             self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
-
-
-
 
     def fButtonStart(self):
         return

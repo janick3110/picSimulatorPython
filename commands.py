@@ -52,18 +52,15 @@ def RRF(register, destination):
     return NotImplemented
 
 
-def BSF(register, bit):
-    binaryList = list(u.integer_to_binary(register))
-    binaryList[14-bit] = "1"
-    binary = "".join(binaryList)
-    print(u.binary_to_integer(binary))
+def BSF(registerVal, bit):
 
+    binary = registerVal | pow(2, bit)
+    return binary
 
-def BCF(register, bit):
-    binaryList = list(u.integer_to_binary(register))
-    binaryList[14 - bit] = "0"
-    binary = "".join(binaryList)
-    print(u.binary_to_integer(binary))
+def BCF(registerVal, bit):
+
+    binary = registerVal & ~(pow(2, bit))
+    return binary
 
 
 def BTFSC(register, bit):
@@ -83,7 +80,10 @@ def BTFSS(register, bit):
 
 
 if __name__ == '__main__':
-    print(u.integer_to_binary(2))
+
+    print(u.integer_to_binary(BSF(0, 7)))
+
+    print(u.integer_to_binary(BCF(0xFF, 0)))
 
 
 

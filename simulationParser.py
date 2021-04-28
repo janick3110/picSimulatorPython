@@ -19,6 +19,7 @@ def prepare_arguments():
 
 
 def scan_arguments(file_name):
+
     """Search for the given string in file and return lines containing that string,
     along with line numbers"""
     line_number = 0
@@ -126,6 +127,7 @@ def execution(argument):
 
 
 def get_file():
+
     root = tk.Tk()
     root.withdraw()
 

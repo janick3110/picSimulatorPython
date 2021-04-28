@@ -1,7 +1,7 @@
 def integer_to_binary(register):
     format = "{0:014b}".format(register)
-    return format
 
+    return format
 
 def binary_to_integer(binary):
     value = 0
