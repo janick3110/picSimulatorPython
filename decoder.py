@@ -29,7 +29,7 @@ def decode(arg):
             elif(arg>>11 == 0b101):
                 #GOTO
         elif(arg>>12 == 0b11):
-            decodeSnowflake(arg>>8)
+            decodeSpecialCases(arg >> 8)
 
 def getParameters(arg):
     jumpAdress = (arg & 0x7FF)
@@ -54,26 +54,34 @@ def decodeByteOriented(arg):
         #CLRF&CLRW
     elif(arg == 0b001001):
         #COMF
+        c.COMF(fileRegAdress,destination)
     elif(arg == 0b000011):
         #DECF
     elif(arg == 0b001011):
-        #DECFSZ
+        #DCFSZ
+        c.DCFSZ(fileRegAdress,destination)
     elif(arg == 0b001010):
         #INCF
     elif(arg == 0b001111):
         #INCFSZ
+        c.INCFSZ(fileRegAdress,destination)
     elif(arg == 0b000100):
         #IORWF
     elif(arg == 0b001000):
         #MOVF
+        c.MOVF(fileRegAdress,destination)
     elif(arg == 0b000000):
         #MOVWF / NOP
+        c.MOVWF(destination)
     elif(arg == 0b001101):
         #RLF
+        c.RLF(fileRegAdress, destination)
     elif(arg == 0b001100):
         #RRF
+        c.RRF(fileRegAdress, destination)
     elif(arg == 0b000010):
         #SUBWF
+        c.SUBWF(fileRegAdress,destination)
     elif(arg == 0b001110):
         #SWAPF
     elif(arg == 0b000110):
@@ -83,14 +91,18 @@ def decodeBitOriented(arg):
 
     if(arg == 0b0100):
         #BCF
+        c.BCF(fileRegAdress,bitAdress)
     elif(arg == 0b0101):
         #BSF
+        c.BSF(fileRegAdress, bitAdress)
     elif(arg == 0b0110):
         #BTFSC
+        c.BTFSC(fileRegAdress, bitAdress)
     elif(arg == 0b0111):
         #BTFSS
+        c.BTFSS(fileRegAdress, bitAdress)
 
-def decodeSnowflake(arg):
+def decodeSpecialCases(arg):
     if(arg == 0b111001):
         #ANDLW
     elif(arg == 0b111000):
@@ -107,9 +119,4 @@ def decodeSnowflake(arg):
         #RETLW
 
 
-if __name__ == '__main__':
-    decode(0x0084)
-    print("-----")
-    decode(0x3005)
-    print("-----")
-    decode(0x080F)
+

@@ -8,6 +8,8 @@ added to the eight bit literal ’k’ and the
 result is placed in the W register."""
     mem.w_register = literal
 
+def COMF(registerVal, destination):
+    registerVal = ~registerVal
 
 def ADDLW(literal):
     mem.w_register += literal
@@ -37,12 +39,22 @@ def SUBWF(register, destination):
     return NotImplemented
 
 
-def DCFSZ(register, destination):
-    return NotImplemented
+def DCFSZ(registerVal, destination):
+    registerVal -= 1
+
+    if registerVal == 0:
+        return True
+    else:
+        return False
 
 
-def INCFSZ(register, destination):
-    return NotImplemented
+def INCFSZ(registerVal, destination):
+    registerVal += 1
+
+    if registerVal == 0:
+        return True
+    else:
+        return False
 
 
 def RLF(registerVal, destination):

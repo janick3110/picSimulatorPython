@@ -1,6 +1,7 @@
 import data
 import simulationParser
 from datetime import datetime
+import decoder
 import app
 import PyQt5.QtWidgets as QtWidgets
 from simulator import Ui_PicSimulator
@@ -32,8 +33,7 @@ def simulate():
 
 def execution(befehlscode):
     print(befehlscode)
-    return NotImplementedError
-
+    decoder.decode(befehlscode)
 
 if __name__ == '__main__':
     simulate()
