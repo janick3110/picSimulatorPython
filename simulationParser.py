@@ -39,13 +39,6 @@ def scan_arguments(file_name):
 
 def parse_file_for_gui(file_name):
     """Parses the file to make it readable"""
-    object = []
-    program_memory = ""
-    command_code = ""
-    line_number = ""
-    label = ""
-    commands = ""
-    comment = ""
     # Open the file in read only mode
     with open(file_name, 'r') as read_obj:
         # Read all lines in the file one by one
