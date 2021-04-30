@@ -1,4 +1,3 @@
-import utility as u
 import memory as mem
 import data
 import time

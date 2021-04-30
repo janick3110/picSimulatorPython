@@ -59,7 +59,6 @@ class Window(QMainWindow, Ui_PicSimulator):
             #self.showCode.selectRow(i) marks table row
 
     def fButtonStart(self):
-        print("Halt")
         actualSimulator.simulate()
 
     def updateClock(self, time):
