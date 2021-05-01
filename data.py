@@ -1,3 +1,6 @@
+import commands as c
+
+
 ##Bank A
 # TMR0
 # PCL
@@ -22,9 +25,7 @@
 # PCLATH
 # INTCON
 
-z_flag = False
-c_flag = False
-rp0 = False
+
 w_register = 0
 
 data_memory = []
@@ -94,3 +95,48 @@ def other_reset():
     data_memory[0x89] = 0
     data_memory[0x8A] = 0  # check again in sheet I'm not sure
     data_memory[0x8B] = data_memory[0x8B] & 0x1  # check again in sheet I'm not sure
+
+
+def getCF():
+    return data_memory[0x03] & 0x01
+
+
+def getDCF():
+    return (data_memory[0x03] & 0x02) >> 1
+
+
+def getZF():
+    return (data_memory[0x03] & 0x04) >> 2
+
+
+def setCF():
+    c.BSF(0x03, 0)
+
+
+def clearCF():
+    c.BCF(0x03, 0)
+
+
+def setDCF():
+    c.BSF(0x03, 1)
+
+
+def clearDCF():
+    c.BCF(0x03, 1)
+
+
+def setZF():
+    c.BSF(0x03, 2)
+
+
+def clearZF():
+    c.BCF(0x03, 2)
+
+
+def checkFlag(c):
+    if c not in range(0, 2):
+        raise ValueError(c)
+
+
+if __name__ == '__main__':
+    checkFlag(2)

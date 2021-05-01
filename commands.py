@@ -1,4 +1,3 @@
-import memory as mem
 import data
 import time
 import actualSimulator as simu
@@ -8,25 +7,33 @@ def MOVLW(literal):
     """The contents of the W register are
 added to the eight bit literal ’k’ and the
 result is placed in the W register."""
+    check(literal, 255)
     data.w_register = literal
 
 
 def COMF(register, destination):
     val = ~data.data_memory[register]
-    WriteInDestination(register, val, destination)
+    zero(val)
+    writeInDestination(register, val, destination)
 
 
 def ADDWF(register, destination):
     val = data.data_memory[register] + data.w_register
-    WriteInDestination(register, val, destination)
+    carry(val)
+    digitalCarry(data.data_memory[register], data.w_register, addf)
+    zero(val % 256)
+    writeInDestination(register, val % 256, destination)
 
 
 def ANDWF(register, destination):
     val = data.data_memory[register] & data.w_register
-    WriteInDestination(register, val, destination)
+    zero(val)
+    writeInDestination(register, val, destination)
 
 
 def CLRX(register, destination):
+    data.setZF()
+
     if(destination == 0):
         data.w_register = 0x0
     elif(destination == 1):
@@ -35,33 +42,49 @@ def CLRX(register, destination):
 
 def DECF(register, destination):
     val = data.data_memory[register] - 1
-    WriteInDestination(register, val, destination)
+    zero(val)
+    writeInDestination(register, val % 256, destination)
 
 
 def INCF(register, destination):
     val = data.data_memory[register] + 1
-    WriteInDestination(register, val, destination)
+    zero(val % 256)
+    writeInDestination(register, val % 256, destination)
 
 
 def IORWF(register, destination):
     val = data.data_memory[register] | data.w_register
-    WriteInDestination(register, val, destination)
+    zero(val)
+    writeInDestination(register, val, destination)
 
 
 def IORLW(literal):
-    data.w_register |= literal
+    val = data.w_register | literal
+    zero(val)
+    data.w_register = val
 
 
 def ADDLW(literal):
-    data.w_register += literal
+    val = data.w_register + literal
+    carry(val)
+    digitalCarry(data.w_register, literal, addf)
+    zero(val % 256)
+    data.w_register = val % 256
 
 
 def ANDLW(literal):
-    data.w_register &= literal
+    val = data.w_register & literal
+    zero(val)
+    data.w_register = val
 
 
 def SUBLW(literal):
-    data.w_register = literal - data.w_register
+    val = literal - data.w_register
+    zero(val % 256)
+    carry(-1 * val)
+    digitalCarry(literal, data.w_register, subf)
+
+    data.w_register = val % 256
 
 
 def CALL(subroutine):
@@ -82,40 +105,44 @@ def NOP():
 
 def MOVF(register, destination):
     val = data.data_memory[register]
-    WriteInDestination(register, val, destination)
+    writeInDestination(register, val, destination)
 
 
 def SUBWF(register, destination):
     val = data.data_memory[register] - data.w_register
-    WriteInDestination(register, val, destination)
+    zero(val % 256)
+    digitalCarry(data.data_memory[register], data.w_register, subf)
+    carry(-1 * val)
+
+    writeInDestination(register, val % 256, destination)
 
 
 def DCFSZ(register, destination):
     val = data.data_memory[register] - 1
     simu.skipnext = (val == 0)
-    WriteInDestination(register, val, destination)
+    writeInDestination(register, val, destination)
 
 
 def INCFSZ(register, destination):
     val = data.data_memory[register] + 1
     simu.skipnext = (val == 0)
-    WriteInDestination(register, val, destination)
+    writeInDestination(register, val, destination)
 
 
 def RLF(register, destination):
     """Rotate right through carry"""
-    c = 1 if data.c_flag else 0
-    data.c_flag = False if data.data_memory[register] < 0x80 else True
+    c = data.getCF()
+    data.clearCF() if data.data_memory[register] < 0x80 else data.setCF()
     val = c | ((data.data_memory[register] << 1) & 0xFF)
-    WriteInDestination(register, val, destination)
+    writeInDestination(register, val, destination)
 
 
 def RRF(register, destination):
     """Rotate right through carry"""
-    c = 0x80 if data.c_flag else 0
-    data.c_flag = False if (data.data_memory[register] % 2) == 0 else True
+    c = data.getCF() * 0x80
+    data.clearCF() if (data.data_memory[register] % 2) == 0 else data.setCF()
     val = c | (register >> 1)
-    WriteInDestination(register, val, destination)
+    writeInDestination(register, val, destination)
 
 
 def BSF(register, bit):
@@ -147,19 +174,21 @@ def SLEEP(duration):
 def SWAPF(register, destination):
     op = data.data_memory[register]
     val = (op >> 4) | ((op & 0b00001111) << 4)
-    WriteInDestination(register, val, destination)
+    writeInDestination(register, val, destination)
 
 
 def XORWF(register, destination):
     val = data.data_memory[register] ^ data.w_register
-    WriteInDestination(register, val, destination)
+    zero(val)
+    writeInDestination(register, val, destination)
 
 
 def XORLW(literal):
-    data.w_register ^= literal
+    val = data.w_register ^ literal
+    zero(val)
+    data.w_register = val
 
-
-def WriteInDestination(register, val, destination):
+def writeInDestination(register, val, destination):
     """Writes value in specified destination"""
     if destination == 0:
         data.w_register = val
@@ -167,13 +196,42 @@ def WriteInDestination(register, val, destination):
         data.data_memory[register] = val
 
 
+def check(tocheck, max):
+    if tocheck > max or tocheck < 0:
+        raise ValueError(tocheck)
+
+
+def zero(z):
+    if z == 0:
+        data.setZF()
+    else:
+        data.clearZF()
+
+
+def carry(c):
+    if c > 255:
+        data.setCF()
+    else:
+        data.clearCF()
+
+def addf(a, b):
+    return (a + b) >> 4
+
+
+def subf(a, b):
+    return 1+((a-b) >> 4)
+
+
+def digitalCarry(a, b, f):
+    a &= 0x0F
+    b &= 0x0F
+    a = f(a, b)
+
+    data.setDCF() if a == 1 else data.clearDCF()
+
+
 if __name__ == '__main__':
-    print(bin(0b11110000))
-    print(bin(COMF(0b11110000, 0)))
-
-    print(bin(pow(2, 12)))
-    print(bin(~(pow(2, 12))))
-
-    print(bin(0b11111111 ^ 0b11110000))
+    data.__innit__()
+    digitalCarry(0x0, 0xF, addf)
 
 
