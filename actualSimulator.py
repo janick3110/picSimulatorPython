@@ -9,6 +9,8 @@ from simulator import Ui_PicSimulator
 diff = 0
 quarz_frequency = 4000
 
+skipnext = False
+
 def simulate():
     data.__innit__()
     steps = 0

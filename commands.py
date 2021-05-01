@@ -1,28 +1,67 @@
 import memory as mem
 import data
 import time
+import actualSimulator as simu
+
 
 def MOVLW(literal):
     """The contents of the W register are
 added to the eight bit literal ’k’ and the
 result is placed in the W register."""
-    mem.w_register = literal
+    data.w_register = literal
 
-def COMF(registerVal, destination):
-    registerVal = ~registerVal
+
+def COMF(register, destination):
+    val = ~data.data_memory[register]
+    WriteInDestination(register, val, destination)
+
+
+def ADDWF(register, destination):
+    val = data.data_memory[register] + data.w_register
+    WriteInDestination(register, val, destination)
+
+
+def ANDWF(register, destination):
+    val = data.data_memory[register] & data.w_register
+    WriteInDestination(register, val, destination)
+
+
+def CLRX(register, destination):
     if(destination == 0):
+        data.w_register = 0x0
+    elif(destination == 1):
+        data.data_memory[register] = 0x0
 
-    else:
+
+def DECF(register, destination):
+    val = data.data_memory[register] - 1
+    WriteInDestination(register, val, destination)
 
 
-    return registerVal
+def INCF(register, destination):
+    val = data.data_memory[register] + 1
+    WriteInDestination(register, val, destination)
+
+
+def IORWF(register, destination):
+    val = data.data_memory[register] | data.w_register
+    WriteInDestination(register, val, destination)
+
+
+def IORLW(literal):
+    data.w_register |= literal
+
 
 def ADDLW(literal):
-    mem.w_register += literal
+    data.w_register += literal
+
+
+def ANDLW(literal):
+    data.w_register &= literal
 
 
 def SUBLW(literal):
-    mem.w_register -= literal
+    data.w_register = literal - data.w_register
 
 
 def CALL(subroutine):
@@ -33,79 +72,100 @@ def GOTO(label):
     return NotImplemented
 
 
-def MOVWF(destination):
-    return NotImplemented
+def MOVWF(register):
+    data.data_memory[register] = data.w_register
 
 
-def MOVF(origin, destination):
-    return NotImplemented
+def NOP():
+    print("nop")
+
+
+def MOVF(register, destination):
+    val = data.data_memory[register]
+    WriteInDestination(register, val, destination)
 
 
 def SUBWF(register, destination):
-    return NotImplemented
+    val = data.data_memory[register] - data.w_register
+    WriteInDestination(register, val, destination)
 
 
-def DCFSZ(registerVal, destination):
-    registerVal -= 1
-
-    if registerVal == 0:
-        return True
-    else:
-        return False
+def DCFSZ(register, destination):
+    val = data.data_memory[register] - 1
+    simu.skipnext = (val == 0)
+    WriteInDestination(register, val, destination)
 
 
-def INCFSZ(registerVal, destination):
-    registerVal += 1
-
-    if registerVal == 0:
-        return True
-    else:
-        return False
+def INCFSZ(register, destination):
+    val = data.data_memory[register] + 1
+    simu.skipnext = (val == 0)
+    WriteInDestination(register, val, destination)
 
 
-def RLF(registerVal, destination):
+def RLF(register, destination):
     """Rotate right through carry"""
     c = 1 if data.c_flag else 0
-    data.c_flag = False if registerVal < 0x80 else True
-    output = c | ((registerVal << 1) & 0xFF)
-    return output
+    data.c_flag = False if data.data_memory[register] < 0x80 else True
+    val = c | ((data.data_memory[register] << 1) & 0xFF)
+    WriteInDestination(register, val, destination)
 
-def RRF(registerVal, destination):
+
+def RRF(register, destination):
     """Rotate right through carry"""
     c = 0x80 if data.c_flag else 0
-    data.c_flag = False if (registerVal % 2) == 0 else True
-    output = c | (registerVal >> 1)
+    data.c_flag = False if (data.data_memory[register] % 2) == 0 else True
+    val = c | (register >> 1)
+    WriteInDestination(register, val, destination)
 
-    return output
 
-def BSF(registerVal, bit):
+def BSF(register, bit):
 
-    output = registerVal | pow(2, bit)
-    return output
+    val = data.data_memory[register] | pow(2, bit)
+    data.data_memory[register] = val
 
-def BCF(registerVal, bit):
 
-    output = registerVal & (pow(2, bit) ^ 0b11111111)
-    return output
+def BCF(register, bit):
+
+    val = data.data_memory[register] & (pow(2, bit) ^ 0b11111111)
+    data.data_memory[register] = val
 
 
 def BTFSC(register, bit):
-    test = register & (pow(2,bit))
-    if test == pow(2,bit):
-        return False
-    else:
-        return True
+    test = data.data_memory[register] & (pow(2, bit))
+    simu.skipnext = (test == 0)
 
 
 def BTFSS(register, bit):
-    test = register & (pow(2,bit))
-    if test == pow(2,bit):
-        return True
-    else:
-        return False
+    test = data.data_memory[register] & (pow(2, bit))
+    simu.skipnext = (test > 0)
+
 
 def SLEEP(duration):
     time.sleep(duration)
+
+
+def SWAPF(register, destination):
+    op = data.data_memory[register]
+    val = (op >> 4) | ((op & 0b00001111) << 4)
+    WriteInDestination(register, val, destination)
+
+
+def XORWF(register, destination):
+    val = data.data_memory[register] ^ data.w_register
+    WriteInDestination(register, val, destination)
+
+
+def XORLW(literal):
+    data.w_register ^= literal
+
+
+def WriteInDestination(register, val, destination):
+    """Writes value in specified destination"""
+    if (destination == 0):
+        data.w_register = val
+    elif (destination == 1):
+        data.data_memory[register] = val
+
 
 if __name__ == '__main__':
     print(bin(0b11110000))

@@ -71,8 +71,11 @@ def decodeByteOriented(arg):
         #MOVF
         c.MOVF(fileRegAdress,destination)
     elif(arg == 0b000000):
-        #MOVWF / NOP
-        c.MOVWF(destination)
+        # MOVWF / NOP
+        if(destination == 0):
+            c.NOP()
+        elif(destination == 1):
+            c.MOVWF(fileRegAdress)
     elif(arg == 0b001101):
         #RLF
         c.RLF(fileRegAdress, destination)
