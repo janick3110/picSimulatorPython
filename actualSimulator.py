@@ -1,5 +1,6 @@
 import data
 import simulationParser
+import time
 from datetime import datetime
 import decoder
 import app
@@ -7,7 +8,8 @@ import PyQt5.QtWidgets as QtWidgets
 from simulator import Ui_PicSimulator
 
 diff = 0
-quarz_frequency = 4000 # 1µs
+quarz_frequency = 4000000 # 4MHz 1µs 1MHz ^ 4µs
+timescale = 1000
 
 skipnext = False
 
@@ -21,6 +23,7 @@ def simulate():
         if int(simulationParser.lst[i][2]) == simulationParser.queue[steps][0]:
 
             execution(int(simulationParser.queue[steps][2], 16))
+            time.sleep(4 / quarz_frequency * timescale)
             steps += 1
 
             if steps >= len(simulationParser.queue):
@@ -30,6 +33,8 @@ def simulate():
         diff = datetime2 - datetime1
 
         #app.Window.updateClock(diff)
+
+
 
     diff = (datetime2 - datetime1) * 1000
     print(diff)
