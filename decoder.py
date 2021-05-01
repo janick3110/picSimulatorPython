@@ -1,24 +1,28 @@
 
 import commands as c
 
-jumpAdress = 0
-fileRegAdress = 0
-constant = 0
-bitAdress = 0
-destination = 0
+
+
+
+jumpAddress = None
+fileRegAddress = None
+constant = None
+bitAddress = None
+destination = None
+
 
 def decode(arg):
     getParameters(arg)
 
     if(arg == 0x64):
         #CLRWDT
-        return NotImplemented
+        raise NotImplemented
     elif(arg == 0x9):
         #RETFIE
-        return NotImplemented
+        raise NotImplemented
     elif(arg == 0x8):
         #RETURN
-        return NotImplemented
+        raise NotImplemented
     elif(arg == 0x63):
         #SLEEP
         c.SLEEP(15)
@@ -30,94 +34,99 @@ def decode(arg):
         elif(arg>>12 == 0b10):
             if(arg>>11 == 0b100):
                 #CALL
-                return NotImplemented
+                raise NotImplemented
             elif(arg>>11 == 0b101):
                 #GOTO
-                return NotImplemented
+                raise NotImplemented
         elif(arg>>12 == 0b11):
             decodeSpecialCases(arg >> 8)
 
 def getParameters(arg):
-    jumpAdress = (arg & 0x7FF)
-    fileRegAdress = (arg & 0x7F)
+    global jumpAddress
+    jumpAddress = (arg & 0x7FF)
+    global fileRegAddress
+    fileRegAddress = (arg & 0x7F)
+    global constant
     constant = (arg & 0xFF)
-    bitAdress = (arg & 0x380)>>7
-    destination = (arg & 0x80)>>7
+    global bitAddress
+    bitAddress = (arg & 0x380) >> 7
+    global destination
+    destination = (arg & 0x80) >> 7
 
-    print("jump " + str(jumpAdress))
-    print("file " + str(fileRegAdress))
+    print("jump " + str(jumpAddress))
+    print("file " + str(fileRegAddress))
     print("const " + str(constant))
-    print("bitad " + str(bitAdress))
+    print("bitad " + str(bitAddress))
     print("desti " + str(destination))
 
 
 def decodeByteOriented(arg):
     if(arg == 0b000111):
         #ADDWF
-        c.ADDWF(fileRegAdress,destination)
+        c.ADDWF(fileRegAddress, destination)
     elif(arg == 0b000101):
         #ANDWF
-        c.ADDWF(fileRegAdress,destination)
+        c.ADDWF(fileRegAddress, destination)
     elif(arg == 0b000001):
         #CLRF&CLRW
-        c.CLRX(fileRegAdress,destination)
+        c.CLRX(fileRegAddress, destination)
     elif(arg == 0b001001):
         #COMF
-        c.COMF(fileRegAdress,destination)
+        c.COMF(fileRegAddress, destination)
     elif(arg == 0b000011):
         #DECF
-        c.DECF(fileRegAdress,destination)
+        c.DECF(fileRegAddress, destination)
     elif(arg == 0b001011):
         #DCFSZ
-        c.DCFSZ(fileRegAdress,destination)
+        c.DCFSZ(fileRegAddress, destination)
     elif(arg == 0b001010):
         #INCF
-        c.INCF(fileRegAdress,destination)
+        c.INCF(fileRegAddress, destination)
     elif(arg == 0b001111):
         #INCFSZ
-        c.INCFSZ(fileRegAdress,destination)
+        c.INCFSZ(fileRegAddress, destination)
     elif(arg == 0b000100):
         #IORWF
-        c.IORWF(fileRegAdress,destination)
+        c.IORWF(fileRegAddress, destination)
     elif(arg == 0b001000):
         #MOVF
-        c.MOVF(fileRegAdress,destination)
+        c.MOVF(fileRegAddress, destination)
     elif(arg == 0b000000):
         # MOVWF / NOP
         if(destination == 0):
             c.NOP()
         elif(destination == 1):
-            c.MOVWF(fileRegAdress)
+            c.MOVWF(fileRegAddress)
     elif(arg == 0b001101):
         #RLF
-        c.RLF(fileRegAdress, destination)
+        c.RLF(fileRegAddress, destination)
     elif(arg == 0b001100):
         #RRF
-        c.RRF(fileRegAdress, destination)
+        c.RRF(fileRegAddress, destination)
     elif(arg == 0b000010):
         #SUBWF
-        c.SUBWF(fileRegAdress,destination)
+        c.SUBWF(fileRegAddress, destination)
     elif(arg == 0b001110):
         #SWAPF
-        c.SUBWF(fileRegAdress,destination)
+        c.SUBWF(fileRegAddress, destination)
     elif(arg == 0b000110):
         #XORWF
-        c.XORWF(fileRegAdress,destination)
+        c.XORWF(fileRegAddress, destination)
 
 def decodeBitOriented(arg):
 
     if(arg == 0b0100):
         #BCF
-        c.BCF(fileRegAdress,bitAdress)
+        c.BCF(fileRegAddress, bitAddress)
     elif(arg == 0b0101):
         #BSF
-        c.BSF(fileRegAdress, bitAdress)
+        c.BSF(fileRegAddress, bitAddress)
     elif(arg == 0b0110):
         #BTFSC
-        c.BTFSC(fileRegAdress, bitAdress)
+        c.BTFSC(fileRegAddress, bitAddress)
     elif(arg == 0b0111):
         #BTFSS
-        c.BTFSS(fileRegAdress, bitAdress)
+        c.BTFSS(fileRegAddress, bitAddress)
 
 def decodeSpecialCases(arg):
     if(arg == 0b111001):
@@ -140,7 +149,7 @@ def decodeSpecialCases(arg):
         c.MOVLW(constant)
     elif(arg>>2 == 0b1101):
         #RETLW
-        return NotImplemented
+        raise NotImplemented
 
 
 
