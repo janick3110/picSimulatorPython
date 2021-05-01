@@ -10,6 +10,12 @@ result is placed in the W register."""
 
 def COMF(registerVal, destination):
     registerVal = ~registerVal
+    if(destination == 0):
+
+    else:
+
+
+    return registerVal
 
 def ADDLW(literal):
     mem.w_register += literal
@@ -79,7 +85,7 @@ def BSF(registerVal, bit):
 
 def BCF(registerVal, bit):
 
-    output = registerVal & ~(pow(2, bit))
+    output = registerVal & (pow(2, bit) ^ 0b11111111)
     return output
 
 
@@ -102,9 +108,12 @@ def SLEEP(duration):
     time.sleep(duration)
 
 if __name__ == '__main__':
-    print(time.time())
-    SLEEP(10)
-    print(time.time())
+    print(bin(0b11110000))
+    print(bin(COMF(0b11110000, 0)))
 
+    print(bin(pow(2, 12)))
+    print(bin(~(pow(2, 12))))
+
+    print(bin(0b11111111 ^ 0b11110000))
 
 
