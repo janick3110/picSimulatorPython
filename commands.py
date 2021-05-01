@@ -161,9 +161,9 @@ def XORLW(literal):
 
 def WriteInDestination(register, val, destination):
     """Writes value in specified destination"""
-    if (destination == 0):
+    if destination == 0:
         data.w_register = val
-    elif (destination == 1):
+    elif destination == 1:
         data.data_memory[register] = val
 
 
