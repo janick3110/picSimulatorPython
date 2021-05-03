@@ -131,6 +131,10 @@ def get_file():
     root.withdraw()
 
     file_path = filedialog.askopenfilename(filetypes=[("Listing-Files", "*.LST")])
+
+    if file_path == "":
+        return
+
     prepare_arguments()
     scan_arguments(file_path)
     parse_file_for_gui(file_path)

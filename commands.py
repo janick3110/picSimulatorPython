@@ -4,6 +4,7 @@ import actualSimulator as simu
 import stack
 
 
+
 def MOVLW(literal):
     """The contents of the W register are
 added to the eight bit literal ’k’ and the
@@ -88,13 +89,13 @@ def SUBLW(literal):
     data.w_register = val % 256
 
 
-def CALL(subroutine):
-    stack.doCall()
-    return NotImplemented
+def CALL(jumpAddress):
+    stack.pushAddress(jumpAddress)
+    simu.index = jumpAddress
 
 
-def GOTO(label):
-    return NotImplemented
+def GOTO(jumpAddress):
+    simu.index = jumpAddress
 
 
 def MOVWF(register):
@@ -167,6 +168,20 @@ def BTFSC(register, bit):
 def BTFSS(register, bit):
     test = data.data_memory[register] & (pow(2, bit))
     simu.skipnext = (test > 0)
+
+
+def RETURN():
+    simu.index = stack.popAddress()
+
+
+def RETLW(literal):
+    data.w_register = literal
+    simu.index = stack.popAddress()
+
+
+def RETFIE():
+    data.setGIE()
+    simu.index = stack.popAddress()
 
 
 def SLEEP(duration):

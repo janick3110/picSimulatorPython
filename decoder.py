@@ -19,10 +19,10 @@ def decode(arg):
         raise NotImplemented
     elif(arg == 0x9):
         #RETFIE
-        raise NotImplemented
+        c.RETFIE()
     elif(arg == 0x8):
         #RETURN
-        raise NotImplemented
+        c.RETURN()
     elif(arg == 0x63):
         #SLEEP
         c.SLEEP(15)
@@ -34,10 +34,10 @@ def decode(arg):
         elif(arg>>12 == 0b10):
             if(arg>>11 == 0b100):
                 #CALL
-                raise NotImplemented
+                c.CALL(jumpAddress)
             elif(arg>>11 == 0b101):
                 #GOTO
-                raise NotImplemented
+                c.GOTO(jumpAddress)
         elif(arg>>12 == 0b11):
             decodeSpecialCases(arg >> 8)
 
@@ -53,11 +53,11 @@ def getParameters(arg):
     global destination
     destination = (arg & 0x80) >> 7
 
-    print("jump " + str(jumpAddress))
-    print("file " + str(fileRegAddress))
-    print("const " + str(constant))
-    print("bitad " + str(bitAddress))
-    print("desti " + str(destination))
+    #print("jump " + str(jumpAddress))
+    #print("file " + str(fileRegAddress))
+    #print("const " + str(constant))
+    #print("bitad " + str(bitAddress))
+    #print("desti " + str(destination))
 
 
 def decodeByteOriented(arg):
@@ -149,7 +149,7 @@ def decodeSpecialCases(arg):
         c.MOVLW(constant)
     elif(arg>>2 == 0b1101):
         #RETLW
-        raise NotImplemented
+        c.RETLW(constant)
 
 
 

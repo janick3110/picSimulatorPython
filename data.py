@@ -133,6 +133,14 @@ def clearZF():
     c.BCF(0x03, 2)
 
 
+def setGIE():
+    c.BSF(0x0B, 7)
+
+
+def clearGIE():
+    c.BCF(0x0B, 7)
+
+
 def checkFlag(c):
     if c not in range(0, 2):
         raise ValueError(c)

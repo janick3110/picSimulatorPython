@@ -33,7 +33,13 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def fLoadFile(self):
         simulationParser.queue = []
+        print(simulationParser.lst)
+        simulationParser.lst = []
+        print(simulationParser.lst)
         simulationParser.get_file()
+
+        for row in range(self.showCode.rowCount()):
+            self.showCode.removeRow(0)
 
         header = self.showCode.horizontalHeader()
         for i in range(0,7):
@@ -54,10 +60,14 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.showCode.setItem(i, 4, QTableWidgetItem(str(simulationParser.lst[i][3])))
             self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
             self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
-            #self.showCode.selectRow(i) marks table row
+
+             # marks table row
 
     def fButtonStart(self):
-        actualSimulator.simulate()
+        if len(simulationParser.queue) > 0:
+            actualSimulator.simulate()
+
+
 
     def updateClock(self, time):
         self.runtime.setText(time)

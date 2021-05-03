@@ -5,12 +5,16 @@ from datetime import datetime
 import decoder
 import app
 import PyQt5.QtWidgets as QtWidgets
+
+import simulator
 from simulator import Ui_PicSimulator
 
 diff = 0
 quarz_frequency = 4000000 # 4MHz 1µs 1MHz ^ 4µs
 timescale = 1000
 index = 0
+timescale = 1000000
+
 skipnext = False
 
 def simulate():
@@ -22,10 +26,11 @@ def simulate():
     for i in range(len(simulationParser.lst)):
 
         if int(simulationParser.lst[i][2]) == simulationParser.queue[index][0]:
-
-            execution(int(simulationParser.queue[index][2], 16))
-            time.sleep(4 / quarz_frequency * timescale)
+            currentIndex = index
             index += 1
+            execution(int(simulationParser.queue[currentIndex][2], 16))
+            time.sleep(4 / quarz_frequency * timescale)
+            print(hex(data.w_register))
 
             if index >= len(simulationParser.queue):
                 break
@@ -44,7 +49,7 @@ def simulate():
     # Befehle abgearbeitet werden
 
 def execution(befehlscode):
-    print(hex(befehlscode))
+    #print(hex(befehlscode))
     decoder.decode(befehlscode)
 
 if __name__ == '__main__':
