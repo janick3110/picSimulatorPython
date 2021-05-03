@@ -6,7 +6,6 @@ stack = [int] * 8
 
 
 def incrementSP():
-
     stack.stackpointer = (stack.stackpointer + 1) % 8
 
 def decrementSP(self):

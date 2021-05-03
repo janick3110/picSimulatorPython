@@ -1,6 +1,7 @@
 import data
 import time
 import actualSimulator as simu
+import stack
 
 
 def MOVLW(literal):
@@ -88,6 +89,7 @@ def SUBLW(literal):
 
 
 def CALL(subroutine):
+    stack.doCall()
     return NotImplemented
 
 
