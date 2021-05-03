@@ -1,4 +1,5 @@
 import sys
+import threading
 
 from PyQt5 import QtCore
 
@@ -64,8 +65,13 @@ class Window(QMainWindow, Ui_PicSimulator):
              # marks table row
 
     def fButtonStart(self):
+
+        for thread in threading.enumerate():
+            print(thread.name)
+
+        simulationThread = threading.Thread(target=actualSimulator.simulate)
         if len(simulationParser.queue) > 0:
-            actualSimulator.simulate()
+            simulationThread.start()
 
 
 

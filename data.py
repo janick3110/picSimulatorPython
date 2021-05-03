@@ -24,7 +24,7 @@ import commands as c
 # EECON2
 # PCLATH
 # INTCON
-
+import stack
 
 w_register = 0
 
@@ -32,6 +32,10 @@ data_memory = []
 
 
 def __innit__():
+
+    for i in range(8):
+        stack.stack.append(0)
+
     """Initialize data memory"""
     for i in range(0xFF):
         data_memory.append(0)

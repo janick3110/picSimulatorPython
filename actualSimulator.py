@@ -20,20 +20,18 @@ skipnext = False
 def simulate():
     data.__innit__()
     global index
-    index = 0
     datetime1 = datetime.now()
 
-    for i in range(len(simulationParser.lst)):
+    while index < len(simulationParser.queue):
 
-        if int(simulationParser.lst[i][2]) == simulationParser.queue[index][0]:
-            currentIndex = index
-            index += 1
-            execution(int(simulationParser.queue[currentIndex][2], 16))
-            time.sleep(4 / quarz_frequency * timescale)
-            print(hex(data.w_register))
+        currentIndex = index
+        index += 1
+        execution(int(simulationParser.queue[currentIndex][2], 16))
+        time.sleep(4 / quarz_frequency * timescale)
+        print(hex(data.w_register))
 
-            if index >= len(simulationParser.queue):
-                break
+        if index >= len(simulationParser.queue):
+            break
         datetime2 = datetime.now()
 
         diff = datetime2 - datetime1

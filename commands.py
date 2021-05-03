@@ -14,7 +14,7 @@ result is placed in the W register."""
 
 
 def COMF(register, destination):
-    val = ~data.data_memory[register]
+    val = data.data_memory[register] ^ 0xFF
     zero(val)
     writeInDestination(register, val, destination)
 
@@ -90,7 +90,7 @@ def SUBLW(literal):
 
 
 def CALL(jumpAddress):
-    stack.pushAddress(jumpAddress)
+    stack.pushAddress(simu.index)
     simu.index = jumpAddress
 
 
@@ -190,7 +190,7 @@ def SLEEP(duration):
 
 def SWAPF(register, destination):
     op = data.data_memory[register]
-    val = (op >> 4) | ((op & 0b00001111) << 4)
+    val = ((op & 0b11110000) >> 4) | ((op & 0b00001111) << 4)
     writeInDestination(register, val, destination)
 
 

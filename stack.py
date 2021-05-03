@@ -1,5 +1,5 @@
-stackpointer = 0
-stack = [int] * 8
+stackpointer = 7
+stack = []
 
 
 def incrementSP():
@@ -13,8 +13,9 @@ def decrementSP():
 
 
 def pushAddress(i):
-    stack[stackpointer] = i
     incrementSP()
+    stack[stackpointer] = i
+
 
 
 def popAddress():

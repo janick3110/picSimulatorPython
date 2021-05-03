@@ -66,7 +66,7 @@ def decodeByteOriented(arg):
         c.ADDWF(fileRegAddress, destination)
     elif(arg == 0b000101):
         #ANDWF
-        c.ADDWF(fileRegAddress, destination)
+        c.ANDWF(fileRegAddress, destination)
     elif(arg == 0b000001):
         #CLRF&CLRW
         c.CLRX(fileRegAddress, destination)
@@ -108,7 +108,7 @@ def decodeByteOriented(arg):
         c.SUBWF(fileRegAddress, destination)
     elif(arg == 0b001110):
         #SWAPF
-        c.SUBWF(fileRegAddress, destination)
+        c.SWAPF(fileRegAddress, destination)
     elif(arg == 0b000110):
         #XORWF
         c.XORWF(fileRegAddress, destination)
