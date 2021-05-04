@@ -15,6 +15,9 @@ from PyQt5.QtWidgets import (
 from simulator import Ui_PicSimulator
 
 
+win = QMainWindow
+
+
 class Window(QMainWindow, Ui_PicSimulator):
 
     def __init__(self, parent=None):
@@ -34,16 +37,16 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def fLoadFile(self):
         simulationParser.queue = []
-        print(simulationParser.lst)
+        # print(simulationParser.lst)
         simulationParser.lst = []
-        print(simulationParser.lst)
+        # print(simulationParser.lst)
         simulationParser.get_file()
 
         for row in range(self.showCode.rowCount()):
             self.showCode.removeRow(0)
 
         header = self.showCode.horizontalHeader()
-        for i in range(0,7):
+        for i in range(0, 7):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
 
         for i in range(len(simulationParser.lst)):
@@ -54,7 +57,10 @@ class Window(QMainWindow, Ui_PicSimulator):
             item.setCheckState(QtCore.Qt.Unchecked)
 
             self.showCode.insertRow(i)
-            self.showCode.setItem(i, 0, item)
+
+            if not(str(simulationParser.lst[i][0]).strip() == ""):
+                self.showCode.setItem(i, 0, item)
+
             self.showCode.setItem(i, 1, QTableWidgetItem(str(simulationParser.lst[i][0])))
             self.showCode.setItem(i, 2, QTableWidgetItem(str(simulationParser.lst[i][1])))
             self.showCode.setItem(i, 3, QTableWidgetItem(str(simulationParser.lst[i][2])))
@@ -62,7 +68,7 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
             self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
 
-             # marks table row
+            # marks table row
 
     def fButtonStart(self):
 
@@ -72,8 +78,6 @@ class Window(QMainWindow, Ui_PicSimulator):
         simulationThread = threading.Thread(target=actualSimulator.simulate)
         if len(simulationParser.queue) > 0:
             simulationThread.start()
-
-
 
     def updateClock(self, time):
         self.runtime.setText(time)
@@ -85,7 +89,7 @@ class FindReplaceDialog(QDialog):
 
         super().__init__(parent)
 
-        #loadUi("ui/find_replace.ui", self)
+        # loadUi("ui/find_replace.ui", self)
 
 
 if __name__ == "__main__":

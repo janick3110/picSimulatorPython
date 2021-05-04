@@ -20,12 +20,16 @@ skipnext = False
 def simulate():
     data.__innit__()
     global index
+    global diff
     datetime1 = datetime.now()
 
     while index < len(simulationParser.queue):
 
         currentIndex = index
         index += 1
+
+        app.win.showCode.selectRow(index)
+
         execution(int(simulationParser.queue[currentIndex][2], 16))
         time.sleep(4 / quarz_frequency * timescale)
         print(hex(data.w_register))
@@ -36,7 +40,7 @@ def simulate():
 
         diff = datetime2 - datetime1
 
-        #app.Window.updateClock(diff)
+        # app.Window.updateClock(diff)
 
 
 

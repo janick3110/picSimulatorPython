@@ -111,21 +111,6 @@ def check_useless_space(string):
     return ""
 
 
-def execution(argument):
-    if argument == "movlw":
-        print("MOVLW")
-    elif argument == "andlw":
-        print("ANDLW")
-    elif argument == "iorlw":
-        print("IORLW")
-    elif argument == "sublw":
-        print("SUBLW")
-    elif argument == "addlw":
-        print("ADDLW")
-    elif argument == "xorlw":
-        print("XORLW")
-
-
 def get_file():
     root = tk.Tk()
     root.withdraw()
@@ -142,12 +127,6 @@ def get_file():
 
 
 #    print(queue)
-
-
-def execute():
-    for argument in arguments:
-        execution(argument)
-
 
 def main():
     get_file()
