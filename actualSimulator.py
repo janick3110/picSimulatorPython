@@ -16,13 +16,13 @@ index = 0
 timescale = 1000000
 breakpoints = []
 skipnext = False
-
+isRunning = False
 
 def simulate(highlight):
     data.__innit__()
     global index
     global diff
-    datetime1 = datetime.now()
+
 
     while index < len(simulationParser.queue):
         if index in breakpoints:
@@ -36,9 +36,7 @@ def simulate(highlight):
 
         if index >= len(simulationParser.queue):
             break
-        datetime2 = datetime.now()
 
-        diff = datetime2 - datetime1
 
         # app.Window.updateClock(diff)
 
