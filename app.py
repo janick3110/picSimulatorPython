@@ -5,13 +5,15 @@ from PyQt5 import QtCore
 
 import simulationParser
 import actualSimulator
-
+import datetime
+import time
 from PyQt5.QtWidgets import (
 
     QApplication, QDialog, QMainWindow, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 
 )
 
+import data
 import simulator
 from simulator import Ui_PicSimulator
 
@@ -36,6 +38,8 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.actionBeenden.triggered.connect(self.close)
         self.actionDatei_laden.triggered.connect(self.fLoadFile)
         self.button_start.pressed.connect(self.fButtonStart)
+
+        self.create_table()
 
     def fLoadFile(self):
         simulationParser.queue = []
@@ -77,6 +81,8 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         # for thread in threading.enumerate():
         #     print(thread.name)
+        actualSimulator.isRunning = True
+        timeThread = threading.Thread(target=self.updateClock)
 
         actualSimulator.breakpoints = []
 
@@ -89,6 +95,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         simulationThread = threading.Thread(target=actualSimulator.simulate, args=[self.highlight, ])
         if len(simulationParser.queue) > 0:
             simulationThread.start()
+            timeThread.start()
 
 
     def highlight(self, index):
@@ -99,9 +106,26 @@ class Window(QMainWindow, Ui_PicSimulator):
         actualSimulator.index += 1
 
 
-    def updateClock(self, time):
-        self.runtime.setText(time)
+    def updateClock(self):
 
+
+        start = 0
+        now = datetime.datetime.now()
+        microseconds = 0
+        start = datetime.datetime.now()
+        while actualSimulator.isRunning:
+            actualSimulator.diff = abs(now-start)
+            microseconds = actualSimulator.diff.total_seconds() * 1000000
+            self.runtime.setText(str(microseconds))
+            now = datetime.datetime.now()
+            time.sleep(1/4)
+
+
+    def create_table(self):
+        data.__innit__()
+        for x in range(0,32):
+            for i in range (0,8):
+                self.showCode.setItem(x, i, QTableWidgetItem(str(data.data_memory[x+i])))
 
 class FindReplaceDialog(QDialog):
 
@@ -121,3 +145,4 @@ if __name__ == "__main__":
     win.show()
 
     sys.exit(app.exec())
+
