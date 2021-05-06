@@ -39,7 +39,12 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.actionDatei_laden.triggered.connect(self.fLoadFile)
         self.button_start.pressed.connect(self.fButtonStart)
 
+        self.quarzFreq.valueChanged.connect(self.fUpdateFrequency)
+
         self.create_table()
+
+    def fUpdateFrequency(self):
+        actualSimulator.quartz_frequency = int(self.quarzFreq.text())
 
     def fLoadFile(self):
         simulationParser.queue = []
@@ -115,10 +120,12 @@ class Window(QMainWindow, Ui_PicSimulator):
         start = datetime.datetime.now()
         while actualSimulator.isRunning:
             actualSimulator.diff = abs(now-start)
-            microseconds = actualSimulator.diff.total_seconds() * 1000000
+
+            microseconds = actualSimulator.diff.total_seconds() * 4 * actualSimulator.timescale / actualSimulator.quartz_frequency
+
             self.runtime.setText(str(microseconds))
             now = datetime.datetime.now()
-            time.sleep(1/4)
+            time.sleep(0.1)
 
 
     def create_table(self):

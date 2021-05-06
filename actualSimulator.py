@@ -10,7 +10,7 @@ import simulator
 from simulator import Ui_PicSimulator
 
 diff = 0
-quarz_frequency = 4000000 # 4MHz 1µs 1MHz ^ 4µs
+quartz_frequency = 4000000 # 4MHz 1µs 1MHz ^ 4µs
 timescale = 1000
 index = 0
 timescale = 1000000
@@ -54,7 +54,7 @@ def execution(befehlscode, highlight):
     #print(hex(befehlscode))
     decoder.decode(befehlscode)
 
-    time.sleep(4 / quarz_frequency * timescale)
+    time.sleep(4 / quartz_frequency * timescale)
     print(hex(data.w_register))
 
 
