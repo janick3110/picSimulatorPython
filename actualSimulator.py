@@ -17,11 +17,14 @@ timescale = 1000000
 breakpoints = []
 skipnext = False
 isRunning = False
+tableUpdater = None
 
-def simulate(highlight):
-    data.__innit__()
+def simulate(highlight, tableUpdate):
+    #data.__innit__()
     global index
     global diff
+    global tableUpdater
+    tableUpdater = tableUpdate
 
 
     while index < len(simulationParser.queue):

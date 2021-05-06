@@ -36,10 +36,12 @@ def ANDWF(register, destination):
 def CLRX(register, destination):
     data.setZF()
 
-    if(destination == 0):
-        data.w_register = 0x0
-    elif(destination == 1):
-        data.data_memory[register] = 0x0
+    # if(destination == 0):
+    #     data.w_register = 0x0
+    # elif(destination == 1):
+    #     data.data_memory[register] = 0x0
+    #
+    writeInDestination(register,0,destination)
 
 
 def DECF(register, destination):
@@ -211,6 +213,7 @@ def writeInDestination(register, val, destination):
         data.w_register = val
     elif destination == 1:
         data.data_memory[register] = val
+        simu.tableUpdater(register)
 
 
 def check(tocheck, max):
