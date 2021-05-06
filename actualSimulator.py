@@ -17,22 +17,22 @@ timescale = 1000000
 breakpoints = []
 skipnext = False
 
-def simulate():
+
+def simulate(highlight):
     data.__innit__()
     global index
     global diff
     datetime1 = datetime.now()
 
     while index < len(simulationParser.queue):
+        if index in breakpoints:
+            break
 
-        currentIndex = index
-        index += 1
+        # table.selectRow(index)
 
-        app.win.showCode.selectRow(index)
+        # app.win.showCode.selectRow(simulationParser.queue[index][0])
 
-        execution(int(simulationParser.queue[currentIndex][2], 16))
-        time.sleep(4 / quarz_frequency * timescale)
-        print(hex(data.w_register))
+        execution(int(simulationParser.queue[index][2], 16), highlight)
 
         if index >= len(simulationParser.queue):
             break
@@ -42,17 +42,23 @@ def simulate():
 
         # app.Window.updateClock(diff)
 
-
-
-    diff = (datetime2 - datetime1) * 1000
     print(diff)
 
     # Speicher vorbereiten
     # Befehle abgearbeitet werden
 
-def execution(befehlscode):
+
+def execution(befehlscode, highlight):
+    global index
+    highlight(simulationParser.queue[index][0])
+    index += 1
+
     #print(hex(befehlscode))
     decoder.decode(befehlscode)
+
+    time.sleep(4 / quarz_frequency * timescale)
+    print(hex(data.w_register))
+
 
 if __name__ == '__main__':
     simulate()

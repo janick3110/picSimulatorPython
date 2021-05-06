@@ -231,6 +231,7 @@ def carry(c):
     else:
         data.clearCF()
 
+
 def addf(a, b):
     return (a + b) >> 4
 

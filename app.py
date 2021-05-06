@@ -12,10 +12,12 @@ from PyQt5.QtWidgets import (
 
 )
 
+import simulator
 from simulator import Ui_PicSimulator
 
 
 win = QMainWindow
+simulationThread = None
 
 
 class Window(QMainWindow, Ui_PicSimulator):
@@ -71,22 +73,31 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def fButtonStart(self):
 
-        for thread in threading.enumerate():
-            print(thread.name)
+
+
+        # for thread in threading.enumerate():
+        #     print(thread.name)
+
+        actualSimulator.breakpoints = []
 
         # get all breakpoints
         for i in range(self.showCode.rowCount()):
             breakpoint_in_table = self.showCode.item(i, 0)
-            if breakpoint_in_table.checkState() == 2:
-                actualSimulator.breakpoints.append((i, int(self.showCode.item(i, 1).text(), 16)))
+            if breakpoint_in_table is not None and breakpoint_in_table.checkState() == 2:
+                actualSimulator.breakpoints.append((int(self.showCode.item(i, 1).text(), 16)))
 
-
-        simulationThread = threading.Thread(target=actualSimulator.simulate)
+        simulationThread = threading.Thread(target=actualSimulator.simulate, args=[self.highlight, ])
         if len(simulationParser.queue) > 0:
             simulationThread.start()
 
+
+    def highlight(self, index):
+        self.showCode.selectRow(index)
+
+
     def step_forward(self):
         actualSimulator.index += 1
+
 
     def updateClock(self, time):
         self.runtime.setText(time)
