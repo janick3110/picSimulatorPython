@@ -14,7 +14,7 @@ quarz_frequency = 4000000 # 4MHz 1µs 1MHz ^ 4µs
 timescale = 1000
 index = 0
 timescale = 1000000
-
+breakpoints = []
 skipnext = False
 
 def simulate():

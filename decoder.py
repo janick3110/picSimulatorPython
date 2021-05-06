@@ -25,7 +25,7 @@ def decode(arg):
         c.RETURN()
     elif(arg == 0x63):
         #SLEEP
-        c.SLEEP(15)
+        c.SLEEP(constant)
     else:
         if(arg>>12 == 0b00):
             decodeByteOriented(arg>>8)

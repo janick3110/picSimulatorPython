@@ -43,11 +43,10 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.showCode.removeRow(0)
 
         header = self.showCode.horizontalHeader()
-        for i in range(0,7):
+        for i in range(0, 7):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
 
         for i in range(len(simulationParser.lst)):
-
             item = QTableWidgetItem()
             item.setFlags(QtCore.Qt.ItemIsUserCheckable |
                           QtCore.Qt.ItemIsEnabled)
@@ -61,19 +60,26 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.showCode.setItem(i, 4, QTableWidgetItem(str(simulationParser.lst[i][3])))
             self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
             self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
-
-             # marks table row
+            # marks table row
 
     def fButtonStart(self):
 
         for thread in threading.enumerate():
             print(thread.name)
 
+        # get all breakpoints
+        for i in range(self.showCode.rowCount()):
+            breakpoint_in_table = self.showCode.item(i, 0)
+            if breakpoint_in_table.checkState() == 2:
+                actualSimulator.breakpoints.append((i, int(self.showCode.item(i, 1).text(), 16)))
+
+
         simulationThread = threading.Thread(target=actualSimulator.simulate)
         if len(simulationParser.queue) > 0:
             simulationThread.start()
 
-
+    def step_forward(self):
+        actualSimulator.index += 1
 
     def updateClock(self, time):
         self.runtime.setText(time)
@@ -82,14 +88,12 @@ class Window(QMainWindow, Ui_PicSimulator):
 class FindReplaceDialog(QDialog):
 
     def __init__(self, parent=None):
-
         super().__init__(parent)
 
-        #loadUi("ui/find_replace.ui", self)
+        # loadUi("ui/find_replace.ui", self)
 
 
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
 
     win = Window()
