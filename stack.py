@@ -20,5 +20,6 @@ def pushAddress(i):
 
 def popAddress():
     out = stack[stackpointer]
+    stack[stackpointer] = 0
     decrementSP()
     return out
