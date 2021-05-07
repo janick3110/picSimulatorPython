@@ -94,7 +94,7 @@ class Window(QMainWindow, Ui_PicSimulator):
             if breakpoint_in_table is not None and breakpoint_in_table.checkState() == 2:
                 actualSimulator.breakpoints.append((int(self.showCode.item(i, 1).text(), 16)))
 
-        simulationThread = threading.Thread(target=actualSimulator.simulate, args=[self.highlight, self.updateDataTable,])
+        simulationThread = threading.Thread(target=actualSimulator.simulate, args=[self.highlight, self.updateGUI,self.updateSpecialRegister, self.getGUIInput])
         if len(simulationParser.queue) > 0:
             simulationThread.start()
             timeThread.start()
@@ -103,7 +103,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.showCode.selectRow(index)
 
     def step_forward(self):
-        actualSimulator.execution(int(simulationParser.queue[actualSimulator.index][2], 16),self.highlight)
+        actualSimulator.execution(int(simulationParser.queue[actualSimulator.index][2], 16),self.highlight, self.updateSpecialRegister,self.updateGUI, self.getGUIInput)
 
     def updateClock(self):
 
@@ -115,23 +115,48 @@ class Window(QMainWindow, Ui_PicSimulator):
             actualSimulator.diff = abs(now - start)
 
             microseconds = actualSimulator.diff.total_seconds() * 4 * actualSimulator.timescale / actualSimulator.quartz_frequency
-
-            self.runtime.setText(str(microseconds))
+            output = str(float("{:.2f}".format(microseconds)))
+            self.runtime.setText(output)
             now = datetime.datetime.now()
-            time.sleep(0.1)
+            time.sleep(.1)
 
     def create_table(self):
         data.__innit__()
-        for x in range(0, 32):
-            for i in range(0, 8):
-                print(x * 8 + i)
-                self.data.setItem(x, i, QTableWidgetItem(str(data.data_memory[x + i])))
+
+        for i in range(len(data.data_memory)):
+            row = int(i / 8)
+            column = i % 8
+            output = str(hex(data.data_memory[i])).replace("0x", "")
+            self.data.setItem(row, column, QTableWidgetItem(output.upper()))
+
+
+    def updateGUI(self):
+        for i in range(len(data.data_memory)):
+            row = int(i / 8)
+            column = i % 8
+            output = str(hex(data.data_memory[i])).replace("0x", "")
+            self.data.setItem(row, column, QTableWidgetItem(output.upper()))
+
+    def getGUIInput(self):
+        for i in range(len(data.data_memory)):
+            row = int(i / 8)
+            column = i % 8
+            data.data_memory[i] = int(self.data.item(row,column).text(), 16)
+
 
     def updateDataTable(self,adress):
-        row = adress % 8
-        column = int(adress / 8)
-        self.data.setItem(row,column,QTableWidgetItem(str(data.data_memory[adress])))
-        print("Update of "+ str(data.data_memory[adress]))
+        row = int(adress / 8)
+        column = adress % 8
+        output = str(hex(data.data_memory[adress])).replace("0x","")
+        print("Update erfolgt " + output + " an Stelle " + str(adress))
+        self.data.setItem(row,column,QTableWidgetItem(output.upper()))
+
+    def updateSpecialRegister(self):
+        output = str(hex(data.w_register)).replace("0x","")
+        self.wRegisterVal.setText(output.upper())
+
+        output = str(hex(data.data_memory[0x02])).replace("0x", "")
+        self.pclVal.setText(output.upper())
 
 
 class FindReplaceDialog(QDialog):

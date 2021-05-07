@@ -17,14 +17,13 @@ timescale = 1000000
 breakpoints = []
 skipnext = False
 isRunning = False
-tableUpdater = None
 
-def simulate(highlight, tableUpdate):
+
+def simulate(highlight, guiUpdate, updateSpecialRegister, guiInput):
     #data.__innit__()
     global index
     global diff
-    global tableUpdater
-    tableUpdater = tableUpdate
+
 
 
     while index < len(simulationParser.queue):
@@ -35,22 +34,19 @@ def simulate(highlight, tableUpdate):
 
         # app.win.showCode.selectRow(simulationParser.queue[index][0])
 
-        execution(int(simulationParser.queue[index][2], 16), highlight)
+        execution(int(simulationParser.queue[index][2], 16), highlight, updateSpecialRegister, guiUpdate, guiInput)
 
         if index >= len(simulationParser.queue):
             break
 
 
-        # app.Window.updateClock(diff)
-
-    print(diff)
-
     # Speicher vorbereiten
     # Befehle abgearbeitet werden
 
 
-def execution(befehlscode, highlight):
+def execution(befehlscode, highlight, updateSpecialRegister, guiUpdate, guiInput):
     global index
+    guiInput()
     highlight(simulationParser.queue[index][0])
     index += 1
 
@@ -58,7 +54,11 @@ def execution(befehlscode, highlight):
     decoder.decode(befehlscode)
 
     time.sleep(4 / quartz_frequency * timescale)
-    print(hex(data.w_register))
+
+    data.data_memory[0x02] = index & 0b11111111
+    #print(hex(data.w_register))
+    updateSpecialRegister()
+    guiUpdate()
 
 
 if __name__ == '__main__':

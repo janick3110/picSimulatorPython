@@ -101,7 +101,8 @@ def GOTO(jumpAddress):
 
 
 def MOVWF(register):
-    data.data_memory[register] = data.w_register
+    #data.data_memory[register] = data.w_register
+    writeInDestination(register,data.w_register,1)
 
 
 def NOP():
@@ -213,7 +214,6 @@ def writeInDestination(register, val, destination):
         data.w_register = val
     elif destination == 1:
         data.data_memory[register] = val
-        simu.tableUpdater(register)
 
 
 def check(tocheck, max):
