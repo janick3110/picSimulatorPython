@@ -147,6 +147,7 @@ def RLF(register, destination):
 
 def RRF(register, destination):
     """Rotate right through carry"""
+    #TODO Überprüfe auf Richtigkeit
     c = data.getCF() * 0x80
     data.clearCF() if (data.data_memory[register] % 2) == 0 else data.setCF()
     val = c | (register >> 1)
@@ -167,12 +168,16 @@ def BCF(register, bit):
 
 def BTFSC(register, bit):
     test = data.data_memory[register] & (pow(2, bit))
-    simu.skipnext = (test == 0)
+    #simu.skipnext = (test == 0)
+    if test == 0:
+        simu.index += 1
 
 
 def BTFSS(register, bit):
     test = data.data_memory[register] & (pow(2, bit))
-    simu.skipnext = (test > 0)
+    #simu.skipnext = (test > 0)
+    if test > 0:
+        simu.index += 1
 
 
 def RETURN():
