@@ -1393,7 +1393,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QTableWidget" name="data">
+     <widget class="QTableWidget" name="tableData">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -1402,13 +1402,13 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>400</width>
+        <width>450</width>
         <height>200</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>400</width>
+        <width>450</width>
         <height>16777215</height>
        </size>
       </property>

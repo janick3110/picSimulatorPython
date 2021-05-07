@@ -23,6 +23,8 @@ simulationThread = None
 
 class Window(QMainWindow, Ui_PicSimulator):
 
+    automaticChange = False
+
     def __init__(self, parent=None):
 
         super().__init__(parent)
@@ -40,42 +42,30 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.button_step.pressed.connect(self.step_forward)
         self.quarzFreq.valueChanged.connect(self.fUpdateFrequency)
 
-        #region Connect Ports
-        self.portAPin0.stateChanged.connect(self.getGUIInput)
-        self.portAPin1.stateChanged.connect(self.getGUIInput)
-        self.portAPin2.stateChanged.connect(self.getGUIInput)
-        self.portAPin3.stateChanged.connect(self.getGUIInput)
-        self.portAPin4.stateChanged.connect(self.getGUIInput)
+        self.tableData.cellChanged.connect(self.updateCells)
 
-        self.portATris0.stateChanged.connect(self.getGUIInput)
-        self.portATris1.stateChanged.connect(self.getGUIInput)
-        self.portATris2.stateChanged.connect(self.getGUIInput)
-        self.portATris3.stateChanged.connect(self.getGUIInput)
-        self.portATris4.stateChanged.connect(self.getGUIInput)
-        self.portATris5.stateChanged.connect(self.getGUIInput)
-        self.portATris6.stateChanged.connect(self.getGUIInput)
-        self.portATris7.stateChanged.connect(self.getGUIInput)
+        self.connectPorts("portAPin", 5)
+        self.connectPorts("portATris", 8)
+        self.connectPorts("portBPin", 8)
+        self.connectPorts("portATris", 8)
 
-        self.portBPin0.stateChanged.connect(self.getGUIInput)
-        self.portBPin1.stateChanged.connect(self.getGUIInput)
-        self.portBPin2.stateChanged.connect(self.getGUIInput)
-        self.portBPin3.stateChanged.connect(self.getGUIInput)
-        self.portBPin4.stateChanged.connect(self.getGUIInput)
-        self.portBPin5.stateChanged.connect(self.getGUIInput)
-        self.portBPin6.stateChanged.connect(self.getGUIInput)
-        self.portBPin7.stateChanged.connect(self.getGUIInput)
-
-        self.portBTris0.stateChanged.connect(self.getGUIInput)
-        self.portBTris1.stateChanged.connect(self.getGUIInput)
-        self.portBTris2.stateChanged.connect(self.getGUIInput)
-        self.portBTris3.stateChanged.connect(self.getGUIInput)
-        self.portBTris4.stateChanged.connect(self.getGUIInput)
-        self.portBTris5.stateChanged.connect(self.getGUIInput)
-        self.portBTris6.stateChanged.connect(self.getGUIInput)
-        self.portBTris7.stateChanged.connect(self.getGUIInput)
         #endregion
 
         self.create_table()
+
+    def updateCells(self):
+        if self.automaticChange:
+            return
+        for i in range(len(data.data_memory)):
+            row = int(i / 8)
+            column = i % 8
+            data.data_memory[i] = int(self.tableData.item(row, column).text(), 16)
+
+    def connectPorts(self, prefix, max):
+        for i in range(max):
+            port = getattr(self, prefix + str(i))
+            port.stateChanged.connect(self.getGUIInput)
+            # port.setChecked(True)
 
     def fUpdateFrequency(self):
         actualSimulator.quartz_frequency = int(self.quarzFreq.text())
@@ -153,7 +143,7 @@ class Window(QMainWindow, Ui_PicSimulator):
             actualSimulator.diff = abs(now - start)
 
             microseconds = actualSimulator.diff.total_seconds() * 4 * actualSimulator.timescale / actualSimulator.quartz_frequency
-            output = str(float("{:.2f}".format(microseconds)))
+            output = str(float("{:.1f}".format(microseconds)))
             self.runtime.setText(output)
             now = datetime.datetime.now()
             time.sleep(.1)
@@ -161,11 +151,14 @@ class Window(QMainWindow, Ui_PicSimulator):
     def create_table(self):
         data.__innit__()
 
+        self.automaticChange = True
         for i in range(len(data.data_memory)):
             row = int(i / 8)
             column = i % 8
             output = str(hex(data.data_memory[i])).replace("0x", "")
-            self.data.setItem(row, column, QTableWidgetItem(output.upper()))
+            self.tableData.setItem(row, column, QTableWidgetItem(output.upper()))
+
+        self.automaticChange = False
 
     def updateGUI(self):
 
@@ -179,51 +172,36 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.stack6Val.setText(str(stack.stack[6]))
         self.stack7Val.setText(str(stack.stack[7]))
 
-        self.UpdateIOPin(self.portAPin0, 5, 0)
-        self.UpdateIOPin(self.portAPin1, 5, 1)
-        self.UpdateIOPin(self.portAPin2, 5, 2)
-        self.UpdateIOPin(self.portAPin3, 5, 3)
-        self.UpdateIOPin(self.portAPin4, 5, 4)
+        self.updateIOPins("portAPin", 5, 0x5)
+        self.updateIOPins("portBPin", 8, 0x6)
+        self.updateIOPins("portATris", 8, 0x85)
+        self.updateIOPins("portBTris", 8, 0x86)
 
-        self.UpdateIOPin(self.portBPin0, 6, 0)
-        self.UpdateIOPin(self.portBPin1, 6, 1)
-        self.UpdateIOPin(self.portBPin2, 6, 2)
-        self.UpdateIOPin(self.portBPin3, 6, 3)
-        self.UpdateIOPin(self.portBPin4, 6, 4)
-        self.UpdateIOPin(self.portBPin5, 6, 5)
-        self.UpdateIOPin(self.portBPin6, 6, 6)
-        self.UpdateIOPin(self.portBPin7, 6, 7)
-
-        self.UpdateIOPin(self.portBTris0, 0x86, 0)
-        self.UpdateIOPin(self.portBTris1, 0x86, 1)
-        self.UpdateIOPin(self.portBTris2, 0x86, 2)
-        self.UpdateIOPin(self.portBTris3, 0x86, 3)
-        self.UpdateIOPin(self.portBTris4, 0x86, 4)
-        self.UpdateIOPin(self.portBTris5, 0x86, 5)
-        self.UpdateIOPin(self.portBTris6, 0x86, 6)
-        self.UpdateIOPin(self.portBTris7, 0x86, 7)
-
-        self.UpdateIOPin(self.portATris0, 0x85, 0)
-        self.UpdateIOPin(self.portATris1, 0x85, 1)
-        self.UpdateIOPin(self.portATris2, 0x85, 2)
-        self.UpdateIOPin(self.portATris3, 0x85, 3)
-        self.UpdateIOPin(self.portATris4, 0x85, 4)
-        self.UpdateIOPin(self.portATris5, 0x85, 5)
-        self.UpdateIOPin(self.portATris6, 0x85, 6)
-        self.UpdateIOPin(self.portATris7, 0x85, 7)
-        # endregion
 
         if data.data_memory[0x03] & 0b00100000 == 0:
-            self.enablePins(True,False)
+            self.enablePins(True, False)
         elif data.data_memory[0x03] & 0b00100000 == 32:
-            self.enablePins(False,True)
+            self.enablePins(False, True)
 
         for i in range(len(data.data_memory)):
             row = int(i / 8)
             column = i % 8
             output = str(hex(data.data_memory[i])).replace("0x", "")
-            self.data.setItem(row, column, QTableWidgetItem(output.upper()))
+            self.tableData.setItem(row, column, QTableWidgetItem(output.upper()))
 
+    def updateIOPins(self, prefix, max, reg):
+
+        for i in range(max):
+            port = getattr(self, prefix + str(i), None)
+            time.sleep(0.002)
+            self.UpdateIOPin(port, reg, i)
+
+    def UpdateIOPin(self, checkbox, address, pos):
+        output = data.data_memory[address] & pow(2, pos)
+        if output == 0:
+            checkbox.setChecked(False)
+        elif output == pow(2, pos):
+            checkbox.setChecked(True)
 
     def enablePins(self, ports, tris):
         self.portAPin0.setEnabled(ports)
@@ -261,23 +239,10 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def readPortBit(self, checkbox, address, pos):
         if checkbox.isChecked():
-            data.data_memory[address] += pow(2,pos)
-
-    def UpdateIOPin(self, checkbox, address, pos):
-        output = data.data_memory[address] & pow(2,pos)
-        if output == 0:
-            checkbox.setChecked(False)
-        elif output == pow(2,pos):
-            checkbox.setChecked(True)
+            data.data_memory[address] |= pow(2, pos)
 
     def getGUIInput(self):
-            #region read Port Values
-            data.data_memory[0x05] = 0
-            data.data_memory[0x06] = 0
-            data.data_memory[0x85] = 0
-            data.data_memory[0x86] = 0
-
-
+            #region Region: read Port Values
             self.readPortBit(self.portAPin0, 0x5, 0)
             self.readPortBit(self.portAPin1, 0x5, 1)
             self.readPortBit(self.portAPin2, 0x5, 2)
@@ -313,17 +278,6 @@ class Window(QMainWindow, Ui_PicSimulator):
 
             # endregion
 
-            for i in range(len(data.data_memory)):
-                row = int(i / 8)
-                column = i % 8
-                data.data_memory[i] = int(self.data.item(row, column).text(), 16)
-
-    def updateDataTable(self, adress):
-        row = int(adress / 8)
-        column = adress % 8
-        output = str(hex(data.data_memory[adress])).replace("0x", "")
-        print("Update erfolgt " + output + " an Stelle " + str(adress))
-        self.data.setItem(row, column, QTableWidgetItem(output.upper()))
 
     def updateSpecialRegister(self):
         output = str(hex(data.w_register)).replace("0x", "")
@@ -332,6 +286,38 @@ class Window(QMainWindow, Ui_PicSimulator):
         output = str(hex(data.data_memory[0x02])).replace("0x", "")
         self.pclVal.setText(output.upper())
 
+        # region Region: set view bits
+        status = data.data_memory[0x3]
+        self.carryBitVal.setText(str(status & 0x00000001))
+        self.digitalCarryBitVal.setText(str((status & 0b00000010) >> 1))
+        self.zeroBitVal.setText(str((status & 0b00000100) >> 2))
+        self.pdBitVal.setText(str((status & 0b00001000) >> 3))
+        self.toBitVal.setText(str((status & 0b00010000) >> 4))
+        self.rp0BitVal.setText(str((status & 0b00100000) >> 5))
+        self.rp1BitVal.setText(str((status & 0b01000000) >> 6))
+        self.irpBitVal.setText(str((status & 0b10000000) >> 7))
+
+        intcon = data.data_memory[0x0b]
+        self.ps0BitVal.setText(str(intcon & 0x00000001))
+        self.ps1BitVal.setText(str((intcon & 0b00000010) >> 1))
+        self.ps2BitVal.setText(str((intcon & 0b00000100) >> 2))
+        self.psaBitVal.setText(str((intcon & 0b00001000) >> 3))
+        self.tseBitVal.setText(str((intcon & 0b00010000) >> 4))
+        self.tcsBitVal.setText(str((intcon & 0b00100000) >> 5))
+        self.iegBitVal.setText(str((intcon & 0b01000000) >> 6))
+        self.rpuBitVal.setText(str((intcon & 0b10000000) >> 7))
+
+        option = data.data_memory[0x81]
+        self.rifBitVal.setText(str(option & 0x00000001))
+        self.ifBitVal.setText(str((option & 0b00000010) >> 1))
+        self.tifBitVal.setText(str((option & 0b00000100) >> 2))
+        self.rieBitVal.setText(str((option & 0b00001000) >> 3))
+        self.ieBitVal.setText(str((option & 0b00010000) >> 4))
+        self.tieBitVal.setText(str((option & 0b00100000) >> 5))
+        self.eieBitVal.setText(str((option & 0b01000000) >> 6))
+        self.gieBitVal.setText(str((option & 0b10000000) >> 7))
+
+        #endregion
 
 class FindReplaceDialog(QDialog):
 

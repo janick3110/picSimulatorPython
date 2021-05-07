@@ -4,6 +4,8 @@ import actualSimulator as simu
 import stack
 
 
+flags = [0x02, 0x82, 0x3, 0x83, 0x4, 0x84, 0xa, 0x8a, 0xb, 0x8b]
+
 
 def MOVLW(literal):
     """The contents of the W register are
@@ -41,7 +43,7 @@ def CLRX(register, destination):
     # elif(destination == 1):
     #     data.data_memory[register] = 0x0
     #
-    writeInDestination(register,0,destination)
+    writeInDestination(register, 0, destination)
 
 
 def DECF(register, destination):
@@ -154,13 +156,13 @@ def RRF(register, destination):
 def BSF(register, bit):
 
     val = data.data_memory[register] | pow(2, bit)
-    data.data_memory[register] = val
+    writeInDestination(register, val, 1)
 
 
 def BCF(register, bit):
 
     val = data.data_memory[register] & (pow(2, bit) ^ 0b11111111)
-    data.data_memory[register] = val
+    writeInDestination(register, val, 1)
 
 
 def BTFSC(register, bit):
@@ -213,7 +215,12 @@ def writeInDestination(register, val, destination):
     if destination == 0:
         data.w_register = val
     elif destination == 1:
-        data.data_memory[register] = val
+        # mirroring shit
+        if register in flags:
+            data.data_memory[register % 0x80] = val
+            data.data_memory[register % 0x80 + 0x80] = val
+        else:
+            data.data_memory[register] = val
 
 
 def check(tocheck, max):
@@ -229,7 +236,7 @@ def zero(z):
 
 
 def carry(c):
-    if c > 255:
+    if c > 255 or c < 0:
         data.setCF()
     else:
         data.clearCF()

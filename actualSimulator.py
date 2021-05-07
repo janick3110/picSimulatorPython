@@ -57,9 +57,14 @@ def execution(befehlscode, highlight, updateSpecialRegister, guiUpdate, guiInput
 
     data.data_memory[0x02] = index & 0b11111111
     #print(hex(data.w_register))
+
     updateSpecialRegister()
+
+    print(index)
+
     guiUpdate()
 
+    print(index)
 
 if __name__ == '__main__':
     simulate()

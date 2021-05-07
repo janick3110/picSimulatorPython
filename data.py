@@ -101,6 +101,9 @@ def other_reset():
     data_memory[0x8B] = data_memory[0x8B] & 0x1  # check again in sheet I'm not sure
 
 
+
+
+
 def getCF():
     return data_memory[0x03] & 0x01
 
@@ -112,37 +115,47 @@ def getDCF():
 def getZF():
     return (data_memory[0x03] & 0x04) >> 2
 
+def setFlag(reg, bit):
+    c.BSF(reg, bit)
+    c.BSF(reg + 0x80, bit)
+
+def clrFlag(reg, bit):
+    c.BCF(reg, bit)
+    c.BCF(reg + 0x80, bit)
 
 def setCF():
     c.BSF(0x03, 0)
-
+    c.BSF(0x83, 0)
 
 def clearCF():
     c.BCF(0x03, 0)
-
+    c.BCF(0x83, 0)
 
 def setDCF():
     c.BSF(0x03, 1)
-
+    c.BSF(0x83, 1)
 
 def clearDCF():
     c.BCF(0x03, 1)
-
+    c.BCF(0x83, 1)
 
 def setZF():
     c.BSF(0x03, 2)
-
+    c.BSF(0x83, 2)
 
 def clearZF():
     c.BCF(0x03, 2)
+    c.BCF(0x83, 2)
 
 
 def setGIE():
     c.BSF(0x0B, 7)
+    c.BSF(0x8B, 7)
 
 
 def clearGIE():
     c.BCF(0x0B, 7)
+    c.BCF(0x8B, 7)
 
 
 def checkFlag(c):
