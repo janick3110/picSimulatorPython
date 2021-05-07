@@ -241,42 +241,20 @@ class Window(QMainWindow, Ui_PicSimulator):
         if checkbox.isChecked():
             data.data_memory[address] |= pow(2, pos)
 
+
+    def readPin(self, prefix, max, register):
+        for i in range(max):
+            port = getattr(self, prefix + str(i), None)
+            time.sleep(0.002)
+            self.readPortBit(port,register,i)
+
+
     def getGUIInput(self):
-            #region Region: read Port Values
-            self.readPortBit(self.portAPin0, 0x5, 0)
-            self.readPortBit(self.portAPin1, 0x5, 1)
-            self.readPortBit(self.portAPin2, 0x5, 2)
-            self.readPortBit(self.portAPin3, 0x5, 3)
-            self.readPortBit(self.portAPin4, 0x5, 4)
+            self.readPin("portAPin",5,0x05)
+            self.readPin("portATris",5,0x85)
 
-            self.readPortBit(self.portBPin0, 0x6, 0)
-            self.readPortBit(self.portBPin1, 0x6, 1)
-            self.readPortBit(self.portBPin2, 0x6, 2)
-            self.readPortBit(self.portBPin3, 0x6, 3)
-            self.readPortBit(self.portBPin4, 0x6, 4)
-            self.readPortBit(self.portBPin5, 0x6, 5)
-            self.readPortBit(self.portBPin6, 0x6, 6)
-            self.readPortBit(self.portBPin7, 0x6, 7)
-
-            self.readPortBit(self.portATris0, 0x85, 0)
-            self.readPortBit(self.portATris1, 0x85, 1)
-            self.readPortBit(self.portATris2, 0x85, 2)
-            self.readPortBit(self.portATris3, 0x85, 3)
-            self.readPortBit(self.portATris4, 0x85, 4)
-            self.readPortBit(self.portATris5, 0x85, 5)
-            self.readPortBit(self.portATris6, 0x85, 6)
-            self.readPortBit(self.portATris7, 0x85, 7)
-
-            self.readPortBit(self.portBTris0, 0x86, 0)
-            self.readPortBit(self.portBTris1, 0x86, 1)
-            self.readPortBit(self.portBTris2, 0x86, 2)
-            self.readPortBit(self.portBTris3, 0x86, 3)
-            self.readPortBit(self.portBTris4, 0x86, 4)
-            self.readPortBit(self.portBTris5, 0x86, 5)
-            self.readPortBit(self.portBTris6, 0x86, 6)
-            self.readPortBit(self.portBTris7, 0x86, 7)
-
-            # endregion
+            self.readPin("portBPin", 5, 0x06)
+            self.readPin("portBTris", 5, 0x86)
 
 
     def updateSpecialRegister(self):

@@ -176,7 +176,7 @@ def BTFSC(register, bit):
 def BTFSS(register, bit):
     test = data.data_memory[register] & (pow(2, bit))
     #simu.skipnext = (test > 0)
-    if test > 0:
+    if test == pow(2,bit):
         simu.index += 1
 
 
