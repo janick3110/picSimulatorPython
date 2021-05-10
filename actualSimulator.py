@@ -58,7 +58,7 @@ def execution(befehlscode, highlight, updateSpecialRegister, guiUpdate, guiInput
     else:
         skipnext = False
 
-    commands.doTimerStuff()
+    commands.doTimer()
 
     time.sleep(4 / quartz_frequency * timescale)
 

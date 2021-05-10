@@ -267,32 +267,45 @@ def digitalCarry(a, b, f):
 
     data.setDCF() if a == 1 else data.clearDCF()
 
-def doTimerStuff():
+def doTimer():
 
     if ((data.data_memory[0x81] & 0b00100000) >> 5) == 0:
         val = data.data_memory[0x01] + 1
         data.data_memory[0x01] = val % 0x100
         if val > 0xFF:
-            # TODO Interrupt
+            doInterrupt()
             return
 
 
-    elif ((data.data_memory[0x81] & 0b00100000) >> 5) == 1:
-        if ((data.data_memory[0x81] & 0b00001000) >> 3) == 0:
-            # TODO Prescaler durchlaufen
-            return
-        elif ((data.data_memory[0x81] & 0b00001000) >> 3) == 1:
-            # TODO Signal direkt auf Timer
-            return
+    # elif ((data.data_memory[0x81] & 0b00100000) >> 5) == 1:
+    #     if ((data.data_memory[0x81] & 0b00001000) >> 3) == 0:
+    #         # TODO Prescaler durchlaufen
+    #         return
+    #     elif ((data.data_memory[0x81] & 0b00001000) >> 3) == 1:
+    #         # TODO Signal direkt auf Timer
+    #         return
 
 # Formel für Zeit Quarzfreq[Hz] / 4 * Prescaler * 2 ^ 8
 
     return
 
-def doInterruptStuff():
-    if ((data.data_memory[0x0B] & 0b10000000) >> 7) == 1:
-        return
-
+def doInterrupt():
+    #timer interrupt
+    if (data.data_memory[0x0B] & 0b10100100) == 0xA4:
+        print("Timer Interrupt")
+        BSF(0x81,7)
+        simu.index = 0x4
+        CALL(simu.index)
+    elif (data.data_memory[0x0B] & 0b10001001) == 0x89:
+        print("RB Interrupt")
+        BSF(0x81,7)
+        simu.index = 0x4
+        CALL(simu.index)
+    elif (data.data_memory[0x0B] & 0b10010010) == 0x92:
+        print("RB Interrupt")
+        BSF(0x81,7)
+        simu.index = 0x4
+        CALL(simu.index)
 
 
 if __name__ == '__main__':
