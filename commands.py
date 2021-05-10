@@ -113,6 +113,12 @@ def NOP():
 
 def MOVF(register, destination):
     val = data.data_memory[register]
+
+    if val == 0:
+        data.setZF()
+    else:
+        data.clearZF()
+
     writeInDestination(register, val, destination)
 
 
@@ -126,13 +132,13 @@ def SUBWF(register, destination):
 
 
 def DCFSZ(register, destination):
-    val = data.data_memory[register] - 1
+    val = (data.data_memory[register] - 1) % 0x100
     simu.skipnext = (val == 0)
     writeInDestination(register, val, destination)
 
 
 def INCFSZ(register, destination):
-    val = data.data_memory[register] + 1
+    val = (data.data_memory[register] + 1) % 0x100
     simu.skipnext = (val == 0)
     writeInDestination(register, val, destination)
 
@@ -147,10 +153,9 @@ def RLF(register, destination):
 
 def RRF(register, destination):
     """Rotate right through carry"""
-    #TODO Überprüfe auf Richtigkeit
     c = data.getCF() * 0x80
     data.clearCF() if (data.data_memory[register] % 2) == 0 else data.setCF()
-    val = c | (register >> 1)
+    val = c | (data.data_memory[register] >> 1)
     writeInDestination(register, val, destination)
 
 
@@ -261,6 +266,33 @@ def digitalCarry(a, b, f):
     a = f(a, b)
 
     data.setDCF() if a == 1 else data.clearDCF()
+
+def doTimerStuff():
+
+    if ((data.data_memory[0x81] & 0b00100000) >> 5) == 0:
+        val = data.data_memory[0x01] + 1
+        data.data_memory[0x01] = val % 0x100
+        if val > 0xFF:
+            # TODO Interrupt
+            return
+
+
+    elif ((data.data_memory[0x81] & 0b00100000) >> 5) == 1:
+        if ((data.data_memory[0x81] & 0b00001000) >> 3) == 0:
+            # TODO Prescaler durchlaufen
+            return
+        elif ((data.data_memory[0x81] & 0b00001000) >> 3) == 1:
+            # TODO Signal direkt auf Timer
+            return
+
+# Formel für Zeit Quarzfreq[Hz] / 4 * Prescaler * 2 ^ 8
+
+    return
+
+def doInterruptStuff():
+    if ((data.data_memory[0x0B] & 0b10000000) >> 7) == 1:
+        return
+
 
 
 if __name__ == '__main__':

@@ -37,7 +37,7 @@ def __innit__():
         stack.stack.append(0)
 
     """Initialize data memory"""
-    for i in range(0xFF):
+    for i in range(0x100):
         data_memory.append(0)
     power_on_or_reset()
     print("Initialization done")

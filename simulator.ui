@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>1027</height>
+    <height>1001</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,9 +52,9 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>20</y>
+             <y>31</y>
              <width>212</width>
-             <height>152</height>
+             <height>151</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -226,10 +226,10 @@
           <widget class="QWidget" name="gridLayoutWidget_4">
            <property name="geometry">
             <rect>
-             <x>9</x>
-             <y>19</y>
+             <x>10</x>
+             <y>31</y>
              <width>371</width>
-             <height>152</height>
+             <height>151</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
@@ -599,7 +599,7 @@
           <property name="minimumSize">
            <size>
             <width>110</width>
-            <height>190</height>
+            <height>200</height>
            </size>
           </property>
           <property name="maximumSize">
@@ -867,7 +867,7 @@
     <item>
      <layout class="QVBoxLayout" name="vertical_Info">
       <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+       <enum>QLayout::SetFixedSize</enum>
       </property>
       <item>
        <widget class="QLabel" name="label_16">
@@ -890,6 +890,12 @@
       </item>
       <item>
        <widget class="QSpinBox" name="quarzFreq">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimum">
          <number>0</number>
         </property>
@@ -1053,7 +1059,7 @@
         <property name="title">
          <string>Port A</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -1213,7 +1219,7 @@
         <property name="title">
          <string>Port B</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>

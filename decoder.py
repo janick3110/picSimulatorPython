@@ -43,12 +43,15 @@ def getParameters(arg):
     global jumpAddress
     jumpAddress = (arg & 0x7FF)
     global fileRegAddress
-    print(data.data_memory[3])
+    # print(data.data_memory[3])
     rp0 = (data.data_memory[3] & 0b00100000) >> 5
     if rp0 == 1:
         fileRegAddress = (arg & 0x7F) + 0x80
     else:
         fileRegAddress = (arg & 0x7F)
+    if (fileRegAddress % 0x80) == 0:
+        fileRegAddress = data.data_memory[0x4]
+
     global constant
     constant = (arg & 0xFF)
     global bitAddress

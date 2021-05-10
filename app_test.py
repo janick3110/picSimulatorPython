@@ -20,9 +20,8 @@ from simulator import Ui_PicSimulator
 win = QMainWindow
 simulationThread = None
 
-outdateTime = 0.005
+outdateTime = 0.1
 
-ports = []
 
 class Window(QMainWindow, Ui_PicSimulator):
 
@@ -50,7 +49,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.connectPorts("portAPin", 5)
         self.connectPorts("portATris", 8)
         self.connectPorts("portBPin", 8)
-        self.connectPorts("portBTris", 8)
+        self.connectPorts("portATris", 8)
 
         #endregion
 
@@ -66,13 +65,10 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def connectPorts(self, prefix, max):
         for i in range(max):
-            portName = prefix + str(i)
-            port = getattr(self, portName)
-
-            ports.append((portName, port))
-
+            port = getattr(self, prefix + str(i))
+            time.sleep(outdateTime)
             port.stateChanged.connect(self.getGUIInput)
-
+            # port.setChecked(True)
 
     def fUpdateFrequency(self):
         actualSimulator.quartz_frequency = int(self.quarzFreq.text())
@@ -179,21 +175,16 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.stack6Val.setText(str(stack.stack[6]))
         self.stack7Val.setText(str(stack.stack[7]))
 
-        # print("stack done")
-
         self.updateIOPins("portAPin", 5, 0x5)
         self.updateIOPins("portBPin", 8, 0x6)
         self.updateIOPins("portATris", 8, 0x85)
         self.updateIOPins("portBTris", 8, 0x86)
 
-        # print("ports done")
 
         if data.data_memory[0x03] & 0b00100000 == 0:
             self.enablePins(True, False)
         elif data.data_memory[0x03] & 0b00100000 == 32:
             self.enablePins(False, True)
-
-        # print("enabeling done")
 
         self.automaticChange = True
         for i in range(len(data.data_memory)):
@@ -203,24 +194,12 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.tableData.setItem(row, column, QTableWidgetItem(output.upper()))
         self.automaticChange = False
 
-        self.tableData.repaint()
-
-        # print("table done")
-
     def updateIOPins(self, prefix, max, reg):
 
-        # print(prefix)
-
         for i in range(max):
-            portName = prefix + str(i)
-            port = None
-            for n in range(len(ports)):
-                if ports[n][0] == portName:
-                    port = ports[n][1]
-                    continue
+            port = getattr(self, prefix + str(i), None)
             time.sleep(outdateTime)
             self.UpdateIOPin(port, reg, i)
-
 
     def UpdateIOPin(self, checkbox, address, pos):
         output = data.data_memory[address] & pow(2, pos)
@@ -270,43 +249,25 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def readPin(self, prefix, max, register):
         for i in range(max):
-            portName = prefix + str(i)
-            port = None
-            for n in range(len(ports)):
-                if ports[n][0] == portName:
-                    port = ports[n][1]
-                    continue
-            if port is None:
-                print(portName)
-
+            port = getattr(self, prefix + str(i), None)
+            time.sleep(outdateTime)
             self.readPortBit(port, register, i)
 
 
     def getGUIInput(self):
-            self.readPin("portAPin", 5, 0x05)
-            self.readPin("portATris", 5, 0x85)
+            self.readPin("portAPin",5,0x05)
+            self.readPin("portATris",5,0x85)
 
             self.readPin("portBPin", 5, 0x06)
             self.readPin("portBTris", 5, 0x86)
 
 
     def updateSpecialRegister(self):
-
-        output = str(hex(data.data_memory[0x01])).replace("0x", "")
-        self.timer0Val.setText(output.upper())
         output = str(hex(data.w_register)).replace("0x", "")
         self.wRegisterVal.setText(output.upper())
+
         output = str(hex(data.data_memory[0x02])).replace("0x", "")
         self.pclVal.setText(output.upper())
-        output = str(hex(data.data_memory[0x03])).replace("0x", "")
-        self.statusVal.setText(output.upper())
-        output = str(hex(data.data_memory[0x04])).replace("0x", "")
-        self.fsrVal.setText(output.upper())
-        output = str(hex(data.data_memory[0x81])).replace("0x", "")
-        self.optionVal
-
-
-
 
         # region Region: set view bits
         status = data.data_memory[0x3]
