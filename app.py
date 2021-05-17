@@ -369,12 +369,12 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         #endregion
 
-class FindReplaceDialog(QDialog):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        # loadUi("ui/find_replace.ui", self)
+# class FindReplaceDialog(QDialog):
+#
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#
+#         # loadUi("ui/find_replace.ui", self)
 
 
 if __name__ == "__main__":
