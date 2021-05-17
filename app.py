@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
 
 import data
 import simulator
+from commands import BCF, BSF, getBit, doInterrupt
 from simulator import Ui_PicSimulator
 
 win = QMainWindow
@@ -47,6 +48,7 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         self.tableData.cellChanged.connect(self.updateCells)
 
+
         self.connectPorts("portAPin", 5)
         self.connectPorts("portATris", 8)
         self.connectPorts("portBPin", 8)
@@ -65,12 +67,18 @@ class Window(QMainWindow, Ui_PicSimulator):
             data.data_memory[i] = int(self.tableData.item(row, column).text(), 16)
 
     def connectPorts(self, prefix, max):
+
+        if self.automaticChange:
+            return
+        
         for i in range(max):
             portName = prefix + str(i)
             port = getattr(self, portName)
 
             ports.append((portName, port))
+            
 
+            
             port.stateChanged.connect(self.getGUIInput)
 
 
@@ -203,14 +211,14 @@ class Window(QMainWindow, Ui_PicSimulator):
             self.tableData.setItem(row, column, QTableWidgetItem(output.upper()))
         self.automaticChange = False
 
-        self.tableData.repaint()
-
+        self.repaint()
+        self.update()
         # print("table done")
 
     def updateIOPins(self, prefix, max, reg):
 
         # print(prefix)
-
+        self.automaticChange = True
         for i in range(max):
             portName = prefix + str(i)
             port = None
@@ -220,14 +228,16 @@ class Window(QMainWindow, Ui_PicSimulator):
                     continue
             time.sleep(outdateTime)
             self.UpdateIOPin(port, reg, i)
-
+        self.automaticChange = False
 
     def UpdateIOPin(self, checkbox, address, pos):
         output = data.data_memory[address] & pow(2, pos)
+
         if output == 0:
             checkbox.setChecked(False)
         elif output == pow(2, pos):
             checkbox.setChecked(True)
+
 
     def enablePins(self, ports, tris):
         self.portAPin0.setEnabled(ports)
@@ -264,9 +274,27 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.portBTris0.setEnabled(tris)
 
     def readPortBit(self, checkbox, address, pos):
-        if checkbox.isChecked():
-            data.data_memory[address] |= pow(2, pos)
+        comp1 =  1 if checkbox.isChecked() else 0
+        comp2 = getBit(address, pos)
 
+        positions = [0, 4, 5, 6, 7]
+
+        intedge = True if getBit(0x81, 6) == 1 else False
+
+        if address == 0x06 and pos in positions:
+            if (comp2 > comp1 and not intedge) or (comp2 < comp1 and intedge):
+                if pos == 0:
+                    BSF(0x0B, 1)
+                    doInterrupt()
+            elif comp1 is not comp2 and pos in [4, 5, 6, 7]:
+                BSF(0x0B, 0)
+                doInterrupt()
+
+        if checkbox.isChecked():
+            BSF(address, pos)
+
+        else:
+            BCF(address, pos)
 
     def readPin(self, prefix, max, register):
         for i in range(max):
@@ -284,10 +312,10 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def getGUIInput(self):
             self.readPin("portAPin", 5, 0x05)
-            self.readPin("portATris", 5, 0x85)
+            self.readPin("portATris", 8, 0x85)
 
-            self.readPin("portBPin", 5, 0x06)
-            self.readPin("portBTris", 5, 0x86)
+            self.readPin("portBPin", 8, 0x06)
+            self.readPin("portBTris", 8, 0x86)
 
 
     def updateSpecialRegister(self):

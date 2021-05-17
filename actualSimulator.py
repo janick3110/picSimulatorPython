@@ -13,7 +13,7 @@ from simulator import Ui_PicSimulator
 diff = 0
 quartz_frequency = 4000000 # 4MHz 1µs 1MHz ^ 4µs
 index = 0
-timescale = 400000
+timescale = 500000
 breakpoints = []
 skipnext = False
 isRunning = False

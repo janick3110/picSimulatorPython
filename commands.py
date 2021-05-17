@@ -273,6 +273,7 @@ def doTimer():
         val = data.data_memory[0x01] + 1
         data.data_memory[0x01] = val % 0x100
         if val > 0xFF:
+            BSF(0x81, 2)
             doInterrupt()
             return
 
@@ -293,20 +294,19 @@ def doInterrupt():
     #timer interrupt
     if (data.data_memory[0x0B] & 0b10100100) == 0xA4:
         print("Timer Interrupt")
-        BSF(0x81,7)
-        simu.index = 0x4
-        CALL(simu.index)
+        BCF(0x81, 7)
+        CALL(0x4)
     elif (data.data_memory[0x0B] & 0b10001001) == 0x89:
         print("RB Interrupt")
-        BSF(0x81,7)
-        simu.index = 0x4
-        CALL(simu.index)
+        BCF(0x81, 7)
+        CALL(0x4)
     elif (data.data_memory[0x0B] & 0b10010010) == 0x92:
         print("RB Interrupt")
-        BSF(0x81,7)
-        simu.index = 0x4
-        CALL(simu.index)
+        BCF(0x81, 7)
+        CALL(0x4)
 
+def getBit(address, pos):
+    return (data.data_memory[address] & pow(2, pos)) >> pos
 
 if __name__ == '__main__':
     data.__innit__()
