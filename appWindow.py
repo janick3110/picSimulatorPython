@@ -43,7 +43,9 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.button_start.pressed.connect(self.fButtonStart)
         self.button_stop.pressed.connect(self.fButtonStop)
         self.button_step.pressed.connect(self.step_forward)
-        self.quarzFreq.valueChanged.connect(self.fUpdateFrequency)
+
+        # self.quarzFreq.valueChanged.connect(self.fUpdateFrequency)
+        self.quarzFreq.editingFinished.connect(self.fUpdateFrequency)
 
         self.tableData.cellChanged.connect(self.updateCells)
 
@@ -248,6 +250,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         #     print(thread.name)
         actualSimulator.isRunning = True
         timeThread = threading.Thread(target=self.updateClock)
+        timeThread.daemon = True
 
         actualSimulator.breakpoints = []
 
@@ -259,6 +262,7 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         simulationThread = threading.Thread(target=actualSimulator.simulate,
                                             args=[self.highlight, self.updateAll, ])
+        simulationThread.daemon = True
         if len(simulationParser.queue) > 0:
             simulationThread.start()
             timeThread.start()
