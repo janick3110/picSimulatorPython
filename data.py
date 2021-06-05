@@ -1,7 +1,6 @@
 import commands as c
 
-
-##Bank A
+# Bank A
 # TMR0
 # PCL
 # Status
@@ -13,7 +12,7 @@ import commands as c
 # PCLATH
 # INTCON
 
-##Bank B
+# Bank B
 # Option
 # PCL
 # STATUS
@@ -32,11 +31,11 @@ data_memory = []
 
 
 def __innit__():
+    """Initialize data memory"""
 
     for i in range(8):
         stack.stack.append(0)
 
-    """Initialize data memory"""
     for i in range(0x100):
         data_memory.append(0)
     power_on_or_reset()
@@ -101,9 +100,6 @@ def other_reset():
     data_memory[0x8B] = data_memory[0x8B] & 0x1  # check again in sheet I'm not sure
 
 
-
-
-
 def getCF():
     return data_memory[0x03] & 0x01
 
@@ -115,33 +111,41 @@ def getDCF():
 def getZF():
     return (data_memory[0x03] & 0x04) >> 2
 
+
 def setFlag(reg, bit):
     c.BSF(reg, bit)
     c.BSF(reg + 0x80, bit)
+
 
 def clrFlag(reg, bit):
     c.BCF(reg, bit)
     c.BCF(reg + 0x80, bit)
 
+
 def setCF():
     c.BSF(0x03, 0)
     c.BSF(0x83, 0)
+
 
 def clearCF():
     c.BCF(0x03, 0)
     c.BCF(0x83, 0)
 
+
 def setDCF():
     c.BSF(0x03, 1)
     c.BSF(0x83, 1)
+
 
 def clearDCF():
     c.BCF(0x03, 1)
     c.BCF(0x83, 1)
 
+
 def setZF():
     c.BSF(0x03, 2)
     c.BSF(0x83, 2)
+
 
 def clearZF():
     c.BCF(0x03, 2)

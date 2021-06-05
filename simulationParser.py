@@ -123,10 +123,7 @@ def get_file():
     prepare_arguments()
     scan_arguments(file_path)
     parse_file_for_gui(file_path)
-    print(lst)
 
-
-#    print(queue)
 
 def main():
     get_file()

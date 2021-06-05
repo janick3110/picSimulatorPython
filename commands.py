@@ -3,7 +3,6 @@ import time
 import actualSimulator as simu
 import stack
 
-
 flags = [0x02, 0x82, 0x3, 0x83, 0x4, 0x84, 0xa, 0x8a, 0xb, 0x8b]
 
 
@@ -103,8 +102,8 @@ def GOTO(jumpAddress):
 
 
 def MOVWF(register):
-    #data.data_memory[register] = data.w_register
-    writeInDestination(register,data.w_register,1)
+    # data.data_memory[register] = data.w_register
+    writeInDestination(register, data.w_register, 1)
 
 
 def NOP():
@@ -160,28 +159,26 @@ def RRF(register, destination):
 
 
 def BSF(register, bit):
-
     val = data.data_memory[register] | pow(2, bit)
     writeInDestination(register, val, 1)
 
 
 def BCF(register, bit):
-
     val = data.data_memory[register] & (pow(2, bit) ^ 0b11111111)
     writeInDestination(register, val, 1)
 
 
 def BTFSC(register, bit):
     test = data.data_memory[register] & (pow(2, bit))
-    #simu.skipnext = (test == 0)
+    # simu.skipnext = (test == 0)
     if test == 0:
         simu.index += 1
 
 
 def BTFSS(register, bit):
     test = data.data_memory[register] & (pow(2, bit))
-    #simu.skipnext = (test > 0)
-    if test == pow(2,bit):
+    # simu.skipnext = (test > 0)
+    if test == pow(2, bit):
         simu.index += 1
 
 
@@ -220,6 +217,7 @@ def XORLW(literal):
     zero(val)
     data.w_register = val
 
+
 def writeInDestination(register, val, destination):
     """Writes value in specified destination"""
     if destination == 0:
@@ -257,7 +255,7 @@ def addf(a, b):
 
 
 def subf(a, b):
-    return 1+((a-b) >> 4)
+    return 1 + ((a - b) >> 4)
 
 
 def digitalCarry(a, b, f):
@@ -267,8 +265,8 @@ def digitalCarry(a, b, f):
 
     data.setDCF() if a == 1 else data.clearDCF()
 
-def doTimer():
 
+def doTimer():
     if ((data.data_memory[0x81] & 0b00100000) >> 5) == 0:
         val = data.data_memory[0x01] + 1
         data.data_memory[0x01] = val % 0x100
@@ -276,7 +274,6 @@ def doTimer():
             BSF(0x81, 2)
             doInterrupt()
             return
-
 
     # elif ((data.data_memory[0x81] & 0b00100000) >> 5) == 1:
     #     if ((data.data_memory[0x81] & 0b00001000) >> 3) == 0:
@@ -286,12 +283,13 @@ def doTimer():
     #         # TODO Signal direkt auf Timer
     #         return
 
-# Formel für Zeit Quarzfreq[Hz] / 4 * Prescaler * 2 ^ 8
+    # Formel für Zeit Quarzfreq[Hz] / 4 * Prescaler * 2 ^ 8
 
     return
 
+
 def doInterrupt():
-    #timer interrupt
+    # timer interrupt
     if (data.data_memory[0x0B] & 0b10100100) == 0xA4:
         print("Timer Interrupt")
         BCF(0x81, 7)
@@ -305,11 +303,11 @@ def doInterrupt():
         BCF(0x81, 7)
         CALL(0x4)
 
+
 def getBit(address, pos):
     return (data.data_memory[address] & pow(2, pos)) >> pos
+
 
 if __name__ == '__main__':
     data.__innit__()
     digitalCarry(0x0, 0xF, addf)
-
-
