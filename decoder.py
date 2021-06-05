@@ -9,6 +9,9 @@ destination = None
 
 
 def decode(arg):
+
+    print("Info: Decode command --> " + str(hex(arg)))
+
     getParameters(arg)
 
     if arg == 0x64:

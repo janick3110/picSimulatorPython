@@ -24,6 +24,7 @@ def simulate(highlight, updateAll):
     global index
     global diff
     global stop
+    global isRunning
 
     while index < len(simulationParser.queue):
 
@@ -42,7 +43,7 @@ def simulate(highlight, updateAll):
 
         if index >= len(simulationParser.queue):
             break
-
+    isRunning = False
     # Speicher vorbereiten
     # Befehle abgearbeitet werden
 

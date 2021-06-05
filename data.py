@@ -33,9 +33,11 @@ data_memory = []
 def __innit__():
     """Initialize data memory"""
 
+    stack.stack.clear()
     for i in range(8):
         stack.stack.append(0)
 
+    data_memory.clear()
     for i in range(0x100):
         data_memory.append(0)
     power_on_or_reset()

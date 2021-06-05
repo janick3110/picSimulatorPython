@@ -43,6 +43,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.button_start.pressed.connect(self.fButtonStart)
         self.button_stop.pressed.connect(self.fButtonStop)
         self.button_step.pressed.connect(self.step_forward)
+        self.button_reset.pressed.connect(self.fButtonReset)
 
         # self.quarzFreq.valueChanged.connect(self.fUpdateFrequency)
         self.quarzFreq.editingFinished.connect(self.fUpdateFrequency)
@@ -249,6 +250,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         # for thread in threading.enumerate():
         #     print(thread.name)
         actualSimulator.isRunning = True
+
         timeThread = threading.Thread(target=self.updateClock)
         timeThread.daemon = True
 
@@ -263,12 +265,25 @@ class Window(QMainWindow, Ui_PicSimulator):
         simulationThread = threading.Thread(target=actualSimulator.simulate,
                                             args=[self.highlight, self.updateAll, ])
         simulationThread.daemon = True
+
         if len(simulationParser.queue) > 0:
             simulationThread.start()
             timeThread.start()
 
+
+
     def fButtonStop(self):
         actualSimulator.stop = True
+
+    def fButtonReset(self):
+        self.fButtonStop()
+        time.sleep(1)
+        data.__innit__()
+        self.resetCodeFile()
+        self.create_table()
+        data.w_register = 0
+        actualSimulator.index = 0
+        self.updateAll()
 
     # endregion
 
@@ -295,7 +310,7 @@ class Window(QMainWindow, Ui_PicSimulator):
         output = str(hex(data.data_memory[0x04])).replace("0x", "")
         self.fsrVal.setText(output.upper())
         output = str(hex(data.data_memory[0x81])).replace("0x", "")
-        self.optionVal
+        # self.optionVal
 
         # region Region: set view bits
         status = data.data_memory[0x3]
@@ -403,40 +418,25 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         self.lockPorts()
 
-        self.portAPin0.setEnabled(ports)
-        self.portAPin1.setEnabled(ports)
-        self.portAPin2.setEnabled(ports)
-        self.portAPin3.setEnabled(ports)
-        self.portAPin4.setEnabled(ports)
-
-        self.portBPin1.setEnabled(ports)
-        self.portBPin2.setEnabled(ports)
-        self.portBPin3.setEnabled(ports)
-        self.portBPin4.setEnabled(ports)
-        self.portBPin5.setEnabled(ports)
-        self.portBPin6.setEnabled(ports)
-        self.portBPin7.setEnabled(ports)
-        self.portBPin0.setEnabled(ports)
-
-        self.portATris1.setEnabled(tris)
-        self.portATris2.setEnabled(tris)
-        self.portATris3.setEnabled(tris)
-        self.portATris4.setEnabled(tris)
-        self.portATris5.setEnabled(tris)
-        self.portATris6.setEnabled(tris)
-        self.portATris7.setEnabled(tris)
-        self.portATris0.setEnabled(tris)
-
-        self.portBTris1.setEnabled(tris)
-        self.portBTris2.setEnabled(tris)
-        self.portBTris3.setEnabled(tris)
-        self.portBTris4.setEnabled(tris)
-        self.portBTris5.setEnabled(tris)
-        self.portBTris6.setEnabled(tris)
-        self.portBTris7.setEnabled(tris)
-        self.portBTris0.setEnabled(tris)
+        self.enableIOPinGroup("portAPin", 5, ports)
+        self.enableIOPinGroup("portBPin", 8, ports)
+        self.enableIOPinGroup("portATris", 8, tris)
+        self.enableIOPinGroup("portBTris", 8, tris)
 
         self.unlockPorts()
+
+    def enableIOPinGroup(self, prefix, max, enable):
+
+        for i in range(max):
+            portName = prefix + str(i)
+
+            port = self.getPort(portName)
+
+            port.blockSignals(True)
+            port.setEnabled(enable)
+            port.blockSignals(False)
+
+        return
 
     # endregion
 
