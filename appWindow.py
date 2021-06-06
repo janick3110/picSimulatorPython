@@ -14,12 +14,14 @@ import stack
 
 from commands import getBit, doInterrupt, BSF, BCF
 from simulator import Ui_PicSimulator
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from multiprocessing import Lock, Process
 
 
 class Window(QMainWindow, Ui_PicSimulator):
     ports = []
+
+    lastRow = None
 
     debugMode = True
     debugLocks = False
@@ -126,7 +128,7 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         for n in range(1, 7):
             widget = QTableWidgetItem(str(simulationParser.lst[i][n - 1]))
-            widget.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            widget.setFlags(Qt.ItemIsEnabled)
             self.showCode.setItem(i, n, widget)
 
 
@@ -201,7 +203,6 @@ class Window(QMainWindow, Ui_PicSimulator):
         else:
             BCF(address, pos)
         self.unlockData()
-
 
     def testInterruptCondition(self, address, pos, newVal, oldVal):
         """Tests for a port change that would cause an interrupt"""
@@ -366,6 +367,9 @@ class Window(QMainWindow, Ui_PicSimulator):
             column = i % 8
             output = str(hex(data.data_memory[i])).replace("0x", "")
             self.tableData.setItem(row, column, QTableWidgetItem(output.upper()))
+
+        self.tableData.hide()
+        self.tableData.show()
 
         self.unlockData()
         self.tableData.blockSignals(False)
@@ -532,7 +536,25 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def highlight(self, index):
 
+
+
+        if self.lastRow is not None:
+            for j in range(self.showCode.columnCount()):
+                self.showCode.item(self.lastRow, j).setBackground(QtGui.QColor(0xFF, 0xFF, 0xFF))
+
+        for j in range(self.showCode.columnCount()):
+            self.showCode.item(index, j).setBackground(QtGui.QColor(0xA0, 0xA0, 0xFF))
+
         self.showCode.selectRow(index)
+
+        self.lastRow = index
+
+        self.showCode.hide()
+        self.showCode.show()
+
+
+
+
 
     def debug(self, info):
         if self.debugMode:
