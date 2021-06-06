@@ -266,13 +266,17 @@ def digitalCarry(a, b, f):
     data.setDCF() if a == 1 else data.clearDCF()
 
 
+def testInterruptCondition():
+    return
+
+
 def doTimer():
+    # Teste ob interner oder externer timer genutzt wird 0 intern 1 extern
     if ((data.data_memory[0x81] & 0b00100000) >> 5) == 0:
         val = data.data_memory[0x01] + 1
         data.data_memory[0x01] = val % 0x100
         if val > 0xFF:
-            BSF(0x81, 2)
-            doInterrupt()
+            BSF(0x0B, 2)
             return
 
     # elif ((data.data_memory[0x81] & 0b00100000) >> 5) == 1:
@@ -292,15 +296,15 @@ def doInterrupt():
     # timer interrupt
     if (data.data_memory[0x0B] & 0b10100100) == 0xA4:
         print("Timer Interrupt")
-        BCF(0x81, 7)
+        BCF(0x0B, 7)
         CALL(0x4)
     elif (data.data_memory[0x0B] & 0b10001001) == 0x89:
         print("RB Interrupt")
-        BCF(0x81, 7)
+        BCF(0x0B, 7)
         CALL(0x4)
     elif (data.data_memory[0x0B] & 0b10010010) == 0x92:
         print("RB Interrupt")
-        BCF(0x81, 7)
+        BCF(0x0B, 7)
         CALL(0x4)
 
 

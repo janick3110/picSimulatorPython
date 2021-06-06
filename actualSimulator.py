@@ -62,6 +62,7 @@ def execution(befehlscode, highlight, updateAll):
         skipnext = False
 
     commands.doTimer()
+    commands.doInterrupt()
 
     time.sleep((4 / quartz_frequency) * timescale)
 

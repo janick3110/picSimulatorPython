@@ -190,10 +190,10 @@ class Window(QMainWindow, Ui_PicSimulator):
         checkboxVal = checkbox.isChecked()
         self.unlockPorts()
 
-        comp1 = 1 if checkboxVal else 0
-        comp2 = getBit(address, pos)
+        newVal = 1 if checkboxVal else 0
+        oldVal = getBit(address, pos)
 
-        self.testInterruptCondition(address, pos, comp1, comp2)
+        self.testInterruptCondition(address, pos, newVal, oldVal)
 
         self.lockData()
         if checkboxVal:
@@ -202,21 +202,23 @@ class Window(QMainWindow, Ui_PicSimulator):
             BCF(address, pos)
         self.unlockData()
 
-    def testInterruptCondition(self, address, pos, comp1, comp2):
+
+    def testInterruptCondition(self, address, pos, newVal, oldVal):
         """Tests for a port change that would cause an interrupt"""
 
         positions = [0, 4, 5, 6, 7]
 
+        # Interrupt Edge Selection Bit 1 Rising 0 Falling
         intedge = True if getBit(0x81, 6) == 1 else False
 
         if address == 0x06 and pos in positions:
-            if (comp2 > comp1 and not intedge) or (comp2 < comp1 and intedge):
+            if (oldVal > newVal and not intedge) or (oldVal < newVal and intedge):
                 if pos == 0:
                     BSF(0x0B, 1)
-                    doInterrupt()
-            elif comp1 is not comp2 and pos in [4, 5, 6, 7]:
+
+            elif newVal is not oldVal and pos in [4, 5, 6, 7]:
                 BSF(0x0B, 0)
-                doInterrupt()
+
 
     # endregion
 
@@ -304,16 +306,22 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         output = str(hex(data.data_memory[0x01])).replace("0x", "")
         self.timer0Val.setText(output.upper())
+
         output = str(hex(data.w_register)).replace("0x", "")
         self.wRegisterVal.setText(output.upper())
+
         output = str(hex(data.data_memory[0x02])).replace("0x", "")
         self.pclVal.setText(output.upper())
+
         output = str(hex(data.data_memory[0x03])).replace("0x", "")
         self.statusVal.setText(output.upper())
+
         output = str(hex(data.data_memory[0x04])).replace("0x", "")
         self.fsrVal.setText(output.upper())
+
         output = str(hex(data.data_memory[0x81])).replace("0x", "")
-        # self.optionVal
+        self.optionVal.setText(output.upper())
+
 
         # region Region: set view bits
         status = data.data_memory[0x3]
@@ -326,25 +334,25 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.rp1BitVal.setText(str((status & 0b01000000) >> 6))
         self.irpBitVal.setText(str((status & 0b10000000) >> 7))
 
-        intcon = data.data_memory[0x0b]
-        self.ps0BitVal.setText(str(intcon & 0x00000001))
-        self.ps1BitVal.setText(str((intcon & 0b00000010) >> 1))
-        self.ps2BitVal.setText(str((intcon & 0b00000100) >> 2))
-        self.psaBitVal.setText(str((intcon & 0b00001000) >> 3))
-        self.tseBitVal.setText(str((intcon & 0b00010000) >> 4))
-        self.tcsBitVal.setText(str((intcon & 0b00100000) >> 5))
-        self.iegBitVal.setText(str((intcon & 0b01000000) >> 6))
-        self.rpuBitVal.setText(str((intcon & 0b10000000) >> 7))
+        option = data.data_memory[0x81] # Intcon
+        self.ps0BitVal.setText(str( option & 0x00000001))
+        self.ps1BitVal.setText(str((option & 0b00000010) >> 1))
+        self.ps2BitVal.setText(str((option & 0b00000100) >> 2))
+        self.psaBitVal.setText(str((option & 0b00001000) >> 3))
+        self.tseBitVal.setText(str((option & 0b00010000) >> 4))
+        self.tcsBitVal.setText(str((option & 0b00100000) >> 5))
+        self.iegBitVal.setText(str((option & 0b01000000) >> 6))
+        self.rpuBitVal.setText(str((option & 0b10000000) >> 7))
 
-        option = data.data_memory[0x81]
-        self.rifBitVal.setText(str(option & 0x00000001))
-        self.ifBitVal.setText(str((option & 0b00000010) >> 1))
-        self.tifBitVal.setText(str((option & 0b00000100) >> 2))
-        self.rieBitVal.setText(str((option & 0b00001000) >> 3))
-        self.ieBitVal.setText(str((option & 0b00010000) >> 4))
-        self.tieBitVal.setText(str((option & 0b00100000) >> 5))
-        self.eieBitVal.setText(str((option & 0b01000000) >> 6))
-        self.gieBitVal.setText(str((option & 0b10000000) >> 7))
+        intcon = data.data_memory[0x0b]
+        self.rifBitVal.setText(str( intcon & 0x00000001))
+        self.ifBitVal.setText(str(( intcon & 0b00000010) >> 1))
+        self.tifBitVal.setText(str((intcon & 0b00000100) >> 2))
+        self.rieBitVal.setText(str((intcon & 0b00001000) >> 3))
+        self.ieBitVal.setText(str(( intcon & 0b00010000) >> 4))
+        self.tieBitVal.setText(str((intcon & 0b00100000) >> 5))
+        self.eieBitVal.setText(str((intcon & 0b01000000) >> 6))
+        self.gieBitVal.setText(str((intcon & 0b10000000) >> 7))
 
         self.unlockData()
 
@@ -363,14 +371,17 @@ class Window(QMainWindow, Ui_PicSimulator):
         self.tableData.blockSignals(False)
 
     def updateStack(self):
-        self.stack0Val.setText(str(stack.stack[0]))
-        self.stack1Val.setText(str(stack.stack[1]))
-        self.stack2Val.setText(str(stack.stack[2]))
-        self.stack3Val.setText(str(stack.stack[3]))
-        self.stack4Val.setText(str(stack.stack[4]))
-        self.stack5Val.setText(str(stack.stack[5]))
-        self.stack6Val.setText(str(stack.stack[6]))
-        self.stack7Val.setText(str(stack.stack[7]))
+
+
+
+        self.stack0Val.setText(hex(stack.stack[0]).replace("0x", "").upper())
+        self.stack1Val.setText(hex(stack.stack[1]).replace("0x", "").upper())
+        self.stack2Val.setText(hex(stack.stack[2]).replace("0x", "").upper())
+        self.stack3Val.setText(hex(stack.stack[3]).replace("0x", "").upper())
+        self.stack4Val.setText(hex(stack.stack[4]).replace("0x", "").upper())
+        self.stack5Val.setText(hex(stack.stack[5]).replace("0x", "").upper())
+        self.stack6Val.setText(hex(stack.stack[6]).replace("0x", "").upper())
+        self.stack7Val.setText(hex(stack.stack[7]).replace("0x", "").upper())
 
     def updateIOPins(self):
         """Safely update IO Pins"""
