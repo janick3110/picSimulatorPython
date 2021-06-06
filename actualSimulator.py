@@ -57,6 +57,7 @@ def execution(befehlscode, highlight, updateAll):
     # print(hex(befehlscode))
     if not skipnext:
         decoder.decode(befehlscode)
+        print("Info: Executed")
     else:
         skipnext = False
 

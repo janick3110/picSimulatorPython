@@ -1,6 +1,7 @@
 import datetime
 import threading
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QHeaderView, QTableWidgetItem, QApplication
 
 import sys
@@ -19,6 +20,9 @@ from multiprocessing import Lock, Process
 
 class Window(QMainWindow, Ui_PicSimulator):
     ports = []
+
+    debugMode = True
+    debugLocks = False
 
     stop = False
 
@@ -73,13 +77,13 @@ class Window(QMainWindow, Ui_PicSimulator):
         data.__innit__()
         self.mapDataToTable()
 
-
     # endregion
 
     # region Button: Load File
 
     def fLoadFile(self):
         """Call subfunctions in order to load file"""
+        self.fButtonReset()
         self.resetCodeFile()
         simulationParser.get_file()
         self.setCodeTableHeader()
@@ -120,20 +124,18 @@ class Window(QMainWindow, Ui_PicSimulator):
         if not (str(simulationParser.lst[i][0]).strip() == ""):
             self.showCode.setItem(i, 0, item)
 
-        self.showCode.setItem(i, 1, QTableWidgetItem(str(simulationParser.lst[i][0])))
-        self.showCode.setItem(i, 2, QTableWidgetItem(str(simulationParser.lst[i][1])))
-        self.showCode.setItem(i, 3, QTableWidgetItem(str(simulationParser.lst[i][2])))
-        self.showCode.setItem(i, 4, QTableWidgetItem(str(simulationParser.lst[i][3])))
-        self.showCode.setItem(i, 5, QTableWidgetItem(str(simulationParser.lst[i][4])))
-        self.showCode.setItem(i, 6, QTableWidgetItem(str(simulationParser.lst[i][5])))
+        for n in range(1, 7):
+            widget = QTableWidgetItem(str(simulationParser.lst[i][n - 1]))
+            widget.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showCode.setItem(i, n, widget)
+
 
     # endregion
 
     # region Checkbox: Port state changed
     def getPortChange(self, portName):
 
-        self.lockData()
-        self.lockPorts()
+        self.debug("Info: Manual Port Change Triggered")
 
         port = self.getPort(portName)
 
@@ -151,12 +153,7 @@ class Window(QMainWindow, Ui_PicSimulator):
 
         self.readPortBit(port, register, bit)
 
-        self.unlockPorts()
-        self.unlockData()
-
         self.updateAll()
-
-
 
         return
 
@@ -189,18 +186,21 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def readPortBit(self, checkbox, address, pos):
 
+        self.lockPorts()
         checkboxVal = checkbox.isChecked()
+        self.unlockPorts()
 
         comp1 = 1 if checkboxVal else 0
         comp2 = getBit(address, pos)
 
         self.testInterruptCondition(address, pos, comp1, comp2)
 
+        self.lockData()
         if checkboxVal:
             BSF(address, pos)
-
         else:
             BCF(address, pos)
+        self.unlockData()
 
     def testInterruptCondition(self, address, pos, comp1, comp2):
         """Tests for a port change that would cause an interrupt"""
@@ -270,14 +270,13 @@ class Window(QMainWindow, Ui_PicSimulator):
             simulationThread.start()
             timeThread.start()
 
-
-
     def fButtonStop(self):
-        actualSimulator.stop = True
+        if actualSimulator.isRunning:
+            actualSimulator.stop = True
 
     def fButtonReset(self):
         self.fButtonStop()
-        time.sleep(1)
+        time.sleep(0.3)
         data.__innit__()
         self.resetCodeFile()
         self.create_table()
@@ -291,9 +290,13 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def updateAll(self):
         self.updateSpecialRegister()
+        # print("Info: Updated Special")
         self.mapDataToTable()
+        # print("Info: Mapped Data")
         self.updateStack()
+        # print("Info: Updated Stack")
         self.updateIOPins()
+        # print("updated IO")
 
     def updateSpecialRegister(self):
 
@@ -371,10 +374,16 @@ class Window(QMainWindow, Ui_PicSimulator):
 
     def updateIOPins(self):
         """Safely update IO Pins"""
+        self.debug("Info: Entering Pin Group update")
+
+
+
         self.updateIOPinGroup("portAPin", 5, 0x5)
         self.updateIOPinGroup("portBPin", 8, 0x6)
         self.updateIOPinGroup("portATris", 8, 0x85)
         self.updateIOPinGroup("portBTris", 8, 0x86)
+
+        self.debug("Info: Groups done")
 
         self.updatePinTrisEnabeling()
 
@@ -382,51 +391,79 @@ class Window(QMainWindow, Ui_PicSimulator):
         # print(prefix)
 
         for i in range(max):
+
             portName = prefix + str(i)
+            # print(portName)
+
+
 
             port = self.getPort(portName)
-
             self.UpdateIOPin(port, reg, i)
 
     def UpdateIOPin(self, checkbox, address, pos):
         self.lockData()
         output = data.data_memory[address] & pow(2, pos)
+
         self.unlockData()
 
-        checkbox.blockSignals(True)
         self.lockPorts()
-        if output == 0:
-            checkbox.setChecked(False)
-        elif output == pow(2, pos):
-            checkbox.setChecked(True)
+        checkbox.blockSignals(True)
+
+        # checkbox = self.portAPin1
+
+        # checked = checkbox.checkState()
+
+        checked = checkbox.isChecked()
         self.unlockPorts()
+
+
+
+        if output == 0 and checked:
+            time.sleep(0.01)
+            self.lockPorts()
+
+            checkbox.setChecked(False)
+
+            self.unlockPorts()
+            time.sleep(0.01)
+        elif output == pow(2, pos) and not checked:
+
+            time.sleep(0.01)
+            self.lockPorts()
+
+            checkbox.setChecked(True)
+
+            self.unlockPorts()
+            time.sleep(0.01)
+
+
         checkbox.blockSignals(False)
 
     def updatePinTrisEnabeling(self):
 
         self.lockData()
+        self.lockPorts()
 
         if data.data_memory[0x03] & 0b00100000 == 0:
             self.enablePins(True, False)
+            time.sleep(0.002)
         elif data.data_memory[0x03] & 0b00100000 == 32:
             self.enablePins(False, True)
+            time.sleep(0.002)
 
+        self.unlockPorts()
         self.unlockData()
 
     def enablePins(self, ports, tris):
         """Enable either Pins or Tris' """
-
-        self.lockPorts()
 
         self.enableIOPinGroup("portAPin", 5, ports)
         self.enableIOPinGroup("portBPin", 8, ports)
         self.enableIOPinGroup("portATris", 8, tris)
         self.enableIOPinGroup("portBTris", 8, tris)
 
-        self.unlockPorts()
-
     def enableIOPinGroup(self, prefix, max, enable):
-
+        print("Info: Entered enabeling")
         for i in range(max):
             portName = prefix + str(i)
 
@@ -465,28 +502,36 @@ class Window(QMainWindow, Ui_PicSimulator):
     # region Helper Functions
 
     def lockData(self):
-        print("--> | Data |")
+        self.debugLocksMSG("--> | Data |")
         self.dataLock.acquire()
-        print("| --> Data |")
+        self.debugLocksMSG("| --> Data |")
 
     def unlockData(self):
         self.dataLock.release()
-        print("| Data | -->")
+        self.debugLocksMSG("| Data | -->")
 
     def lockPorts(self):
-        print("--> | Ports |")
+        self.debugLocksMSG("--> | Ports |")
         self.portLock.acquire()
-        print("| --> Ports |")
+        self.debugLocksMSG("| --> Ports |")
 
     def unlockPorts(self):
         self.portLock.release()
-        print("| Ports | -->")
+        self.debugLocksMSG("| Ports | -->")
 
     def highlight(self, index):
+
         self.showCode.selectRow(index)
 
+    def debug(self, info):
+        if self.debugMode:
+            print(info)
 
+    def debugLocksMSG(self, info):
+        if self.debugLocks:
+            print(info)
     # endregion
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
